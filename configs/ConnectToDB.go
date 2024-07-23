@@ -20,6 +20,7 @@ func ConnectToDB() {
 	if err != nil {
 		log.Fatal("Fail to connect to database")
 	}
+	log.Print("Connected to database")
 }
 
 func GetDB() *gorm.DB {
