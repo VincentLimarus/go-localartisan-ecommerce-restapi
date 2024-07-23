@@ -1,0 +1,4 @@
+PORT = "3000"
+DB_URL = "host=localhost user=postgres password=Vincent27 dbname=localArtisans port=5432 sslmode=disable"
+JWT_SECRET_KEY = "eyJhbGciOiJIUzUxMiJ9.eyJSb2xlIjoiQWRtaW4iLCJJc3N1ZXIiOiJJc3N1ZXIiLCJVc2VybmFtZSI6IkphdmFJblVzZSIsImV4cCI6MTcyMTc1NzUyMywiaWF0IjoxNzIxNzU3NTIzfQ.1VFdTF3kIaVaGwH3BHa7dr_Pvc63buwaax6UWboNr4nmJJWjhWud8YXDUL5UgN0kkczdUxUuKVFi-BLtRefCrA"
+TIMEOUT = "3s"
