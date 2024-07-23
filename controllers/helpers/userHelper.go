@@ -1,0 +1,126 @@
+package helpers
+
+import (
+	"fmt"
+	"localArtisans/configs"
+	"localArtisans/models/database"
+	outputs "localArtisans/models/outputsDTO"
+	"localArtisans/models/requestsDTO"
+	"localArtisans/models/responsesDTO"
+	"localArtisans/utils"
+)
+
+func GetAllUser(GetAllUsersRequestDTO requestsDTO.GetAllUsersRequestDTO) (int, interface{}) {
+	db := configs.GetDB()
+	var users []database.User
+
+	if GetAllUsersRequestDTO.Limit == 0 {
+		output := outputs.BadRequestOutput{
+			Code: 400,
+			Message: "Bad Request: Limit cannot be 0",
+		}
+		return 400, output
+	}
+	
+	if GetAllUsersRequestDTO.Limit > 100 {
+		output := outputs.BadRequestOutput{
+			Code: 400,
+			Message: "Bad Request: Limit cannot be more than 100",
+		}
+		return 400, output
+	}
+
+	offset := (GetAllUsersRequestDTO.Page - 1) * GetAllUsersRequestDTO.Limit
+	order := fmt.Sprintf("%s %s", GetAllUsersRequestDTO.OrderBy, GetAllUsersRequestDTO.OrderType)
+	err := db.Offset(offset).Limit(GetAllUsersRequestDTO.Limit).Order(order).Find(&users).Error
+
+	if err != nil {
+		output := outputs.InternalServerErrorOutput{
+			Code: 500,
+			Message: fmt.Sprintf("Internal Server Error: %v", err),
+		}
+		return 500, output
+	}
+
+	if len(users) == 0 {
+		output := outputs.NotFoundOutput{
+			Code: 404,
+			Message: "Not Found: No data found",
+		}
+		return 404, output
+	}
+
+	var totalData int64
+	var totalPage int 
+	db.Model(&database.User{}).Count(&totalData)
+
+	if totalData % int64(GetAllUsersRequestDTO.Limit) == 0 {
+		totalPage = int(totalData) / GetAllUsersRequestDTO.Limit
+	} else {
+		totalPage = int(totalData) / GetAllUsersRequestDTO.Limit + 1
+	}
+
+	output := outputs.GetAllUserOutput{}
+	output.Page = GetAllUsersRequestDTO.Page
+	output.Limit = GetAllUsersRequestDTO.Limit
+	output.OrderBy = GetAllUsersRequestDTO.OrderBy
+	output.OrderType = GetAllUsersRequestDTO.OrderType
+	output.Code = 200 
+	output.Message = "Success: Data found"
+	output.TotalData = int(totalData)
+	output.TotalTake = len(users)
+	output.TotalPage = totalPage
+	
+	for _, user := range users {
+		output.Data = append(output.Data, responsesDTO.UserResponseDTO{
+			ID: user.ID,
+			Name: user.Name,
+			Email: user.Email,
+			PhoneNumber: user.PhoneNumber,
+			IsActive: user.IsActive,
+			CreatedAt: user.CreatedAt,
+			CreatedBy: user.CreatedBy,
+			UpdatedAt: user.UpdatedAt,
+			UpdatedBy: user.UpdatedBy,
+		})
+	}
+	return 200, output
+}
+
+func GetUser(GetUserRequestDTO requestsDTO.GetUserRequestDTO) (int, interface{}) {
+	db := configs.GetDB()
+	var user database.User
+	err := db.Where("id = ?", utils.StringToUUID(GetUserRequestDTO.ID)).First(&user).Error
+
+	if err != nil {
+		output := outputs.InternalServerErrorOutput{
+			Code: 500,
+			Message: fmt.Sprintf("Internal Server Error: %v", err),
+		}
+		return 500, output
+	}
+
+	if user.ID == (database.User{}).ID {
+		output := outputs.NotFoundOutput{
+			Code: 404,
+			Message: "Not Found: Data not found",
+		}
+		return 404, output
+	}
+
+	output := outputs.GetUserOutput{}
+	output.Code = 200
+	output.Message = "Success: Data found"
+	output.Data = responsesDTO.UserResponseDTO{
+		ID: user.ID,
+		Name: user.Name,
+		Email: user.Email,
+		PhoneNumber: user.PhoneNumber,
+		IsActive: user.IsActive,
+		CreatedAt: user.CreatedAt,
+		CreatedBy: user.CreatedBy,
+		UpdatedAt: user.UpdatedAt,
+		UpdatedBy: user.UpdatedBy,
+	}
+	return 200, output
+}

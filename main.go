@@ -1,6 +1,9 @@
 package main
 
-import "localArtisans/configs"
+import (
+	"localArtisans/configs"
+	"localArtisans/models/database"
+)
 
 func init() {
 	configs.LoadEnvVariables()
@@ -13,5 +16,7 @@ func init() {
 // @BasePath /api/v1
 // @AuthPath /api/v1/auth
 func main() {
+	db := configs.GetDB()
+	db.AutoMigrate(&database.User{})
 	
 }
