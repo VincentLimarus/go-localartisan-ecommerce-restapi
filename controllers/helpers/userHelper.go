@@ -1,10 +1,11 @@
 package helpers
 
 import (
+	"context"
 	"fmt"
 	"localArtisans/configs"
 	"localArtisans/models/database"
-	outputs "localArtisans/models/outputsDTO"
+	outputs "localArtisans/models/outputs"
 	"localArtisans/models/requestsDTO"
 	"localArtisans/models/responsesDTO"
 	"localArtisans/utils"
@@ -77,6 +78,7 @@ func GetAllUser(GetAllUsersRequestDTO requestsDTO.GetAllUsersRequestDTO) (int, i
 			Name: user.Name,
 			Email: user.Email,
 			PhoneNumber: user.PhoneNumber,
+			Address: user.Address,
 			IsActive: user.IsActive,
 			CreatedAt: user.CreatedAt,
 			CreatedBy: user.CreatedBy,
@@ -116,6 +118,131 @@ func GetUser(GetUserRequestDTO requestsDTO.GetUserRequestDTO) (int, interface{})
 		Name: user.Name,
 		Email: user.Email,
 		PhoneNumber: user.PhoneNumber,
+		Address: user.Address,
+		IsActive: user.IsActive,
+		CreatedAt: user.CreatedAt,
+		CreatedBy: user.CreatedBy,
+		UpdatedAt: user.UpdatedAt,
+		UpdatedBy: user.UpdatedBy,
+	}
+	return 200, output
+}
+
+func RegisterUser(RegisterUserRequestDTO requestsDTO.RegisterUserRequestDTO) (int, interface{}){
+	if RegisterUserRequestDTO.Password != RegisterUserRequestDTO.ConfirmPassword {
+		output := outputs.BadRequestOutput{
+			Code: 400,
+			Message: "Bad Request: Password and Confirm Password must be same",
+		}
+		return 400, output
+	}
+	hashedPassword, err := utils.HashPassword(RegisterUserRequestDTO.Password)
+
+
+	if err != nil {
+		if err == context.DeadlineExceeded {
+			return utils.HandleTimeout(err)
+		}
+
+		output := outputs.InternalServerErrorOutput{
+			Code:    500,
+			Message: fmt.Sprintf("Internal Server Error: %v", err),
+		}
+		return 500, output
+	}
+
+	db := configs.GetDB()
+
+	if db == nil{
+		output := outputs.InternalServerErrorOutput{
+			Code: 500,
+			Message: "Internal Server Error: Database connection failed",
+		}
+		return 500, output
+	}
+
+	user := database.User{
+		Name: RegisterUserRequestDTO.Name,
+		Email: RegisterUserRequestDTO.Email,
+		Password: hashedPassword,
+		IsActive: RegisterUserRequestDTO.IsActive,
+		CreatedBy: RegisterUserRequestDTO.CreatedBy,
+	}
+
+	err = db.Create(&user).Error
+	
+	if err != nil {
+		output := outputs.InternalServerErrorOutput{
+			Code: 500,
+			Message: fmt.Sprintf("Internal Server Error: %v", err),
+		}
+		return 500, output
+	}
+	
+	output := outputs.RegisterUserOutput{}
+	output.Code = 200
+	output.Message = "Success: User registered"
+	output.Data = responsesDTO.UserResponseDTO{
+		ID: user.ID,
+		Name: user.Name,
+		Email: user.Email,
+		PhoneNumber: user.PhoneNumber,
+		Address: user.Address,	
+		IsActive: user.IsActive,
+		CreatedAt: user.CreatedAt,
+		CreatedBy: user.CreatedBy,
+		UpdatedAt: user.UpdatedAt,
+		UpdatedBy: user.UpdatedBy,
+		}	
+		return 200, output
+}
+
+func LoginUser(LoginUserRequestDTO requestsDTO.LoginUserRequestDTO) (int, interface{}) {
+	db := configs.GetDB()
+	var user database.User
+	err := db.Where("email = ?", LoginUserRequestDTO.Email).First(&user).Error
+
+	if err != nil {
+		output := outputs.InternalServerErrorOutput{
+			Code: 500,
+			Message: fmt.Sprintf("Internal Server Error: %v", err),
+		}
+		return 500, output
+	}
+
+	if user.ID == (database.User{}).ID {
+		output := outputs.NotFoundOutput{
+			Code: 404,
+			Message: "Not Found: Data not found",
+		}
+		return 404, output
+	}
+
+	if !utils.ComparePassword(LoginUserRequestDTO.Password, user.Password) {
+		output := outputs.BadRequestOutput{
+			Code: 400,
+			Message: "Bad Request: Password is incorrect",
+		}
+		return 400, output
+	}
+
+	if err != nil {
+		output := outputs.InternalServerErrorOutput{
+			Code: 500,
+			Message: fmt.Sprintf("Internal Server Error: %v", err),
+		}
+		return 500, output
+	}
+
+	output := outputs.LoginUserOutput{}
+	output.Code = 200
+	output.Message = "Success: User logged in"
+	output.Data = responsesDTO.UserResponseDTO{
+		ID: user.ID,
+		Name: user.Name,
+		Email: user.Email,
+		PhoneNumber: user.PhoneNumber,
+		Address: user.Address,
 		IsActive: user.IsActive,
 		CreatedAt: user.CreatedAt,
 		CreatedBy: user.CreatedBy,
