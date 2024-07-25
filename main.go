@@ -3,6 +3,7 @@ package main
 import (
 	"localArtisans/configs"
 	"localArtisans/models/database"
+	"localArtisans/routers"
 )
 
 func init() {
@@ -18,5 +19,7 @@ func init() {
 func main() {
 	db := configs.GetDB()
 	db.AutoMigrate(&database.User{})
-	
+
+	r := routers.RoutersConfiguration()
+	r.Run(":3000")
 }

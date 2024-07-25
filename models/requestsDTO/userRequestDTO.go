@@ -30,6 +30,7 @@ type UpdateUserRequestDTO struct {
 	Name        string `json:"name" form:"name" binding:"omitempty"`
 	Email       string `json:"email" form:"email" binding:"omitempty"`
 	PhoneNumber string `json:"phone_number" form:"phone_number" binding:"omitempty"`
+	Address     string `json:"address" form:"address" binding:"omitempty"`
 	IsActive    bool   `json:"is_active" form:"is_active" binding:"omitempty"`
 	UpdatedBy   string `json:"updated_by" form:"updated_by" binding:"omitempty"`
 }
