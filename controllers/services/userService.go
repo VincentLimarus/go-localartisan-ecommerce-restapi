@@ -10,6 +10,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
+	"github.com/google/uuid"
 )
 
 func GetAllUser(c *gin.Context){
@@ -27,9 +28,10 @@ func GetAllUser(c *gin.Context){
 	c.JSON(code, output)
 }
 
-func GetUser(c *gin.Context){
-	var GetUserRequestDTO requestsDTO.GetUserRequestDTO
-	if err := c.ShouldBindWith(&GetUserRequestDTO, binding.Form); err != nil {
+func GetUserByID(c *gin.Context){
+	userID := c.Param("id")
+
+	if _, err := uuid.Parse(userID); err != nil {
 		output := outputs.BadRequestOutput{
 			Code:    400,
 			Message: fmt.Sprintf("Bad Request: %v", err),
@@ -37,7 +39,7 @@ func GetUser(c *gin.Context){
 		c.JSON(http.StatusBadRequest, output)
 		return
 	}
-	code, output := helpers.GetUser(GetUserRequestDTO)
+	code, output := helpers.GetUser(userID)
 	c.JSON(code, output)
 }
 
@@ -70,7 +72,55 @@ func LoginUser(c *gin.Context){
 	c.JSON(code, output)
 }
 
+func UpdateUser(c *gin.Context){
+	var UpdateUserRequestDTO requestsDTO.UpdateUserRequestDTO
+	if err := c.ShouldBindJSON(&UpdateUserRequestDTO); err != nil {
+		output := outputs.BadRequestOutput{
+			Code:    400,
+			Message: fmt.Sprintf("Bad Request: %v", err),
+		}
+		c.JSON(http.StatusBadRequest, output)
+		return
+	}
+	code, output := helpers.UpdateUser(UpdateUserRequestDTO)
+	c.JSON(code, output)
+}
+
+func DeleteUser(c *gin.Context){
+	var DeleteUserRequestDTO requestsDTO.DeleteUserRequestDTO
+	if err := c.ShouldBindJSON(&DeleteUserRequestDTO); err != nil {
+		output := outputs.BadRequestOutput{
+			Code:    400,
+			Message: fmt.Sprintf("Bad Request: %v", err),
+		}
+		c.JSON(http.StatusBadRequest, output)
+		return
+	}
+	code, output := helpers.DeleteUser(DeleteUserRequestDTO)
+	c.JSON(code, output)
+}
+
+func ChangePasswordUser(c *gin.Context){
+	var ChangePasswordRequestDTO requestsDTO.ChangePasswordRequestDTO
+	if err := c.ShouldBindJSON(&ChangePasswordRequestDTO); err != nil {
+		output := outputs.BadRequestOutput{
+			Code:    400,
+			Message: fmt.Sprintf("Bad Request: %v", err),
+		}
+		c.JSON(http.StatusBadRequest, output)
+		return
+	}
+	code, output := helpers.ChangePasswordUser(ChangePasswordRequestDTO)
+	c.JSON(code, output)
+}
+
 func UserService(router *gin.RouterGroup) {
+	router.GET("/users", GetAllUser)
+	router.GET("/users/:id", GetUserByID)
 	router.POST("/users/register", RegisterUser)
 	router.POST("/users/login", LoginUser)
+	
+	router.POST("/users/update", UpdateUser)
+	router.POST("/users/delete", DeleteUser)
+	router.POST("/users/change-password", ChangePasswordUser)
 }

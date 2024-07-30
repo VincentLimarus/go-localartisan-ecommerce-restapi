@@ -46,5 +46,5 @@ type ChangePasswordRequestDTO struct {
 	OldPassword     string `json:"old_password" form:"old_password" binding:"required"`
 	NewPassword     string `json:"new_password" form:"new_password" binding:"required"`
 	ConfirmPassword string `json:"confirm_password" form:"confirm_password" binding:"required"`
-	UpdatedBy       string `json:"updated_by" form:"updated_by" binding:"required"`
+	UpdatedBy       string `json:"updated_by" form:"updated_by" binding:"omitempty"`
 }

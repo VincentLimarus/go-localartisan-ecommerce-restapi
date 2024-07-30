@@ -82,19 +82,19 @@ func GetAllUser(GetAllUsersRequestDTO requestsDTO.GetAllUsersRequestDTO) (int, i
 			PhoneNumber: user.PhoneNumber,
 			Address: user.Address,
 			IsActive: user.IsActive,
-			CreatedAt: user.CreatedAt,
 			CreatedBy: user.CreatedBy,
-			UpdatedAt: user.UpdatedAt,
 			UpdatedBy: user.UpdatedBy,
+			CreatedAt: user.CreatedAt,
+			UpdatedAt: user.UpdatedAt,
 		})
 	}
 	return 200, output
 }
 
-func GetUser(GetUserRequestDTO requestsDTO.GetUserRequestDTO) (int, interface{}) {
+func GetUser(userID string) (int, interface{}) {
 	db := configs.GetDB()
 	var user database.User
-	err := db.Where("id = ?", utils.StringToUUID(GetUserRequestDTO.ID)).First(&user).Error
+	err := db.Table("users").Where("id = ?", userID).First(&user).Error
 
 	if err != nil {
 		output := outputs.InternalServerErrorOutput{
@@ -112,20 +112,23 @@ func GetUser(GetUserRequestDTO requestsDTO.GetUserRequestDTO) (int, interface{})
 		return 404, output
 	}
 
-	output := outputs.GetUserOutput{}
-	output.Code = 200
-	output.Message = "Success: Data found"
-	output.Data = responsesDTO.UserResponseDTO{
-		ID: user.ID,
-		Name: user.Name,
-		Email: user.Email,
-		PhoneNumber: user.PhoneNumber,
-		Address: user.Address,
-		IsActive: user.IsActive,
-		CreatedAt: user.CreatedAt,
-		CreatedBy: user.CreatedBy,
-		UpdatedAt: user.UpdatedAt,
-		UpdatedBy: user.UpdatedBy,
+	output := outputs.GetUserOutput{
+		BaseOutput: outputs.BaseOutput{
+			Code: 200,
+			Message: "Success: Data found",
+		},
+		Data: responsesDTO.UserResponseDTO{
+			ID: user.ID,
+			Name: user.Name,
+			Email: user.Email,
+			PhoneNumber: user.PhoneNumber,
+			Address: user.Address,
+			IsActive: user.IsActive,
+			CreatedBy: user.CreatedBy,
+			UpdatedBy: user.UpdatedBy,
+			CreatedAt: user.CreatedAt,
+			UpdatedAt: user.UpdatedAt,
+		},
 	}
 	return 200, output
 }
@@ -191,10 +194,10 @@ func RegisterUser(RegisterUserRequestDTO requestsDTO.RegisterUserRequestDTO) (in
 		PhoneNumber: user.PhoneNumber,
 		Address: user.Address,	
 		IsActive: user.IsActive,
-		CreatedAt: user.CreatedAt,
 		CreatedBy: user.CreatedBy,
-		UpdatedAt: user.UpdatedAt,
 		UpdatedBy: user.UpdatedBy,
+		CreatedAt: user.CreatedAt,
+		UpdatedAt: user.UpdatedAt,
 		}	
 		return 200, output
 }
@@ -220,7 +223,7 @@ func LoginUser(LoginUserRequestDTO requestsDTO.LoginUserRequestDTO) (int, interf
 		return 404, output
 	}
 
-	if !utils.ComparePassword(LoginUserRequestDTO.Password, user.Password) {
+	if !utils.ComparePassword(user.Password, LoginUserRequestDTO.Password ) {
 		output := outputs.BadRequestOutput{
 			Code: 400,
 			Message: "Bad Request: Password is incorrect",
@@ -228,28 +231,23 @@ func LoginUser(LoginUserRequestDTO requestsDTO.LoginUserRequestDTO) (int, interf
 		return 400, output
 	}
 
-	if err != nil {
-		output := outputs.InternalServerErrorOutput{
-			Code: 500,
-			Message: fmt.Sprintf("Internal Server Error: %v", err),
-		}
-		return 500, output
-	}
-
-	output := outputs.LoginUserOutput{}
-	output.Code = 200
-	output.Message = "Success: User logged in"
-	output.Data = responsesDTO.UserResponseDTO{
-		ID: user.ID,
-		Name: user.Name,
-		Email: user.Email,
-		PhoneNumber: user.PhoneNumber,
-		Address: user.Address,
-		IsActive: user.IsActive,
-		CreatedAt: user.CreatedAt,
-		CreatedBy: user.CreatedBy,
-		UpdatedAt: user.UpdatedAt,
-		UpdatedBy: user.UpdatedBy,
+	output := outputs.LoginUserOutput{
+		BaseOutput: outputs.BaseOutput{
+			Code: 200,
+			Message: "Success: User logged in",
+		},
+		Data : responsesDTO.UserResponseDTO{
+			ID: user.ID,
+			Name: user.Name,
+			Email: user.Email,
+			PhoneNumber: user.PhoneNumber,
+			Address: user.Address,
+			IsActive: user.IsActive,
+			CreatedBy: user.CreatedBy,
+			UpdatedBy: user.UpdatedBy,
+			CreatedAt: user.CreatedAt,
+			UpdatedAt: user.UpdatedAt,
+		},
 	}
 	return 200, output
 }
@@ -299,6 +297,10 @@ func UpdateUser(UpdateUserRequestDTO requestsDTO.UpdateUserRequestDTO) (int, int
 		return 500, output
 	}
 
+	if UpdateUserRequestDTO.UpdatedBy == ""{
+		user.UpdatedBy = "User"
+	}
+	
 	output := outputs.UpdateUserOutput{}
 	output.Code = 200
 	output.Message = "Success: User updated"
@@ -309,10 +311,134 @@ func UpdateUser(UpdateUserRequestDTO requestsDTO.UpdateUserRequestDTO) (int, int
 		PhoneNumber: user.PhoneNumber,
 		Address: user.Address,
 		IsActive: user.IsActive,
-		CreatedAt: user.CreatedAt,
 		CreatedBy: user.CreatedBy,
-		UpdatedAt: user.UpdatedAt,
 		UpdatedBy: user.UpdatedBy,
+		CreatedAt: user.CreatedAt,
+		UpdatedAt: user.UpdatedAt,
 	}
+	return 200, output
+}
+
+func DeleteUser(DeleteUserRequestDTO requestsDTO.DeleteUserRequestDTO) (int, interface{}) {
+	db := configs.GetDB()
+	var user database.User
+	err := db.Where("id = ?", utils.StringToUUID(DeleteUserRequestDTO.ID)).First(&user).Error
+
+	if err != nil {
+		output := outputs.InternalServerErrorOutput{
+			Code: 500,
+			Message: fmt.Sprintf("Internal Server Error: %v", err),
+		}
+		return 500, output
+	}
+
+	if user.ID == uuid.Nil {
+		output := outputs.NotFoundOutput{
+			Code: 404,
+			Message: "Not Found: Data not found",
+		}
+		return 404, output
+	}
+
+	if !utils.ComparePassword(user.Password, DeleteUserRequestDTO.Password) {
+		output := outputs.BadRequestOutput{
+			Code: 400,
+			Message: "Bad Request: Password is incorrect",
+		}
+		return 400, output
+	}
+
+	if err := db.Delete(&user).Error; err != nil {
+		output := outputs.InternalServerErrorOutput{
+			Code: 500,
+			Message: fmt.Sprintf("Internal Server Error: %v", err),
+		}
+		return 500, output
+	}
+
+	output := outputs.DeleteUserOutput{}
+	output.Code = 200
+	output.Message = "Success: User deleted"
+	output.Data = responsesDTO.UserResponseDTO{
+		ID: user.ID,
+		Name: user.Name,
+		Email: user.Email,
+		PhoneNumber: user.PhoneNumber,
+		Address: user.Address,
+		IsActive: user.IsActive,
+		CreatedBy: user.CreatedBy,
+		UpdatedBy: user.UpdatedBy,
+		CreatedAt: user.CreatedAt,
+		UpdatedAt: user.UpdatedAt,
+	}
+
+	return 200, output
+}
+
+func ChangePasswordUser(ChangePasswordUserRequestDTO requestsDTO.ChangePasswordRequestDTO) (int, interface{}){
+	db := configs.GetDB()
+	var user database.User
+	err := db.Where("id = ?", utils.StringToUUID(ChangePasswordUserRequestDTO.ID)).First(&user).Error
+
+	if err != nil {
+		output := outputs.InternalServerErrorOutput{
+			Code: 500,
+			Message: fmt.Sprintf("Internal Server Error: %v", err),
+		}
+		return 500, output
+	}
+
+	if user.ID == uuid.Nil {
+		output := outputs.NotFoundOutput{
+			Code: 404,
+			Message: "Not Found: Data not found",
+		}
+		return 404, output
+	}
+
+	if !utils.ComparePassword(user.Password, ChangePasswordUserRequestDTO.OldPassword) {
+		output := outputs.BadRequestOutput{
+			Code: 400,
+			Message: "Bad Request: Old Password is incorrect",
+		}
+		return 400, output
+	}
+
+	if ChangePasswordUserRequestDTO.NewPassword != ChangePasswordUserRequestDTO.ConfirmPassword {
+		output := outputs.BadRequestOutput{
+			Code: 400,
+			Message: "Bad Request: New Password and Confirm Password must be same",
+		}
+		return 400, output
+	}
+
+	hashedPassword, err := utils.HashPassword(ChangePasswordUserRequestDTO.NewPassword)
+
+	if err != nil {
+		if err == context.DeadlineExceeded {
+			return utils.HandleTimeout(err)
+		}
+
+		output := outputs.InternalServerErrorOutput{
+			Code:    500,
+			Message: fmt.Sprintf("Internal Server Error: %v", err),
+		}
+		return 500, output
+	}
+
+	user.Password = hashedPassword
+	user.UpdatedBy = "User" // Updated being omitempty in the struct so if the user updated the password, user won't fill the JSON so it will automatically filled by the system as (user)
+
+	if err := db.Save(&user).Error; err != nil {
+		output := outputs.InternalServerErrorOutput{
+			Code: 500,
+			Message: fmt.Sprintf("Internal Server Error: %v", err),
+		}
+		return 500, output
+	}
+
+	output := outputs.ChangePasswordOutput{}
+	output.Code = 200
+	output.Message = "Success: Password changed"
 	return 200, output
 }
