@@ -9,6 +9,8 @@ import (
 	"localArtisans/models/requestsDTO"
 	"localArtisans/models/responsesDTO"
 	"localArtisans/utils"
+
+	"github.com/google/uuid"
 )
 
 func GetAllUser(GetAllUsersRequestDTO requestsDTO.GetAllUsersRequestDTO) (int, interface{}) {
@@ -237,6 +239,69 @@ func LoginUser(LoginUserRequestDTO requestsDTO.LoginUserRequestDTO) (int, interf
 	output := outputs.LoginUserOutput{}
 	output.Code = 200
 	output.Message = "Success: User logged in"
+	output.Data = responsesDTO.UserResponseDTO{
+		ID: user.ID,
+		Name: user.Name,
+		Email: user.Email,
+		PhoneNumber: user.PhoneNumber,
+		Address: user.Address,
+		IsActive: user.IsActive,
+		CreatedAt: user.CreatedAt,
+		CreatedBy: user.CreatedBy,
+		UpdatedAt: user.UpdatedAt,
+		UpdatedBy: user.UpdatedBy,
+	}
+	return 200, output
+}
+
+func UpdateUser(UpdateUserRequestDTO requestsDTO.UpdateUserRequestDTO) (int, interface{}) {	
+	db := configs.GetDB()
+	var user database.User
+	err := db.Where("id = ?", utils.StringToUUID(UpdateUserRequestDTO.ID)).First(&user).Error
+
+	if err != nil {
+		output := outputs.InternalServerErrorOutput{
+			Code: 500,
+			Message: fmt.Sprintf("Internal Server Error: %v", err),
+		}
+		return 500, output
+	}
+
+	if user.ID == uuid.Nil {
+		output := outputs.NotFoundOutput{
+			Code: 404,
+			Message: "Not Found: Data not found",
+		}
+		return 404, output
+	}
+
+	if UpdateUserRequestDTO.Name != "" {
+		user.Name = UpdateUserRequestDTO.Name
+	}
+
+	if UpdateUserRequestDTO.Email != "" {
+		user.Email = UpdateUserRequestDTO.Email
+	}
+
+	if UpdateUserRequestDTO.PhoneNumber != "" {
+		user.PhoneNumber = UpdateUserRequestDTO.PhoneNumber
+	}
+
+	if UpdateUserRequestDTO.Address != "" {
+		user.Address = UpdateUserRequestDTO.Address
+	}
+
+	if err := db.Save(&user).Error; err != nil {
+		output := outputs.InternalServerErrorOutput{
+			Code: 500,
+			Message: fmt.Sprintf("Internal Server Error: %v", err),
+		}
+		return 500, output
+	}
+
+	output := outputs.UpdateUserOutput{}
+	output.Code = 200
+	output.Message = "Success: User updated"
 	output.Data = responsesDTO.UserResponseDTO{
 		ID: user.ID,
 		Name: user.Name,
