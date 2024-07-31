@@ -1,5 +1,7 @@
 package requestsDTO
 
+import "github.com/google/uuid"
+
 type GetAllArtisansRequestDTO struct {
 	Page      int    `json:"page" form:"page" binding:"omitempty"`
 	Limit     int    `json:"limit" form:"limit" binding:"omitempty"`
@@ -12,18 +14,18 @@ type GetArtisansRequestDTO struct {
 }
 
 type RegisterArtisanRequestDTO struct {
-	UserID      string `json:"user_id" form:"user_id" binding:"required"`
-	ShopName    string `json:"shop_name" form:"shop_name" binding:"required"`
-	ShopAddress string `json:"shop_address" form:"shop_address" binding:"required"`
-	Description string `json:"description" form:"description" binding:"omitempty"`
-	ShopBanner  string `json:"shop_banner" form:"shop_banner" binding:"omitempty"`
-	IsActive    bool   `json:"is_active" form:"is_active" binding:"omitempty"`
-	CreatedBy   string `json:"created_by" form:"created_by" binding:"omitempty"`
+	UserID      uuid.UUID `json:"user_id" form:"user_id" binding:"required"`
+	ShopName    string    `json:"shop_name" form:"shop_name" binding:"required"`
+	ShopAddress string    `json:"shop_address" form:"shop_address" binding:"required"`
+	Description string    `json:"description" form:"description" binding:"omitempty"`
+	ShopBanner  string    `json:"shop_banner" form:"shop_banner" binding:"omitempty"`
+	IsActive    bool      `json:"is_active" form:"is_active" binding:"omitempty"`
+	CreatedBy   string    `json:"created_by" form:"created_by" binding:"omitempty"`
 }
 
 type UpdateArtisanRequestDTO struct {
 	ID          string `json:"id" form:"id" binding:"required"`
-	UserID      string `json:"user_id" form:"user_id" binding:"omitempty"`
+	UserID      uuid.UUID `json:"user_id" form:"user_id" binding:"omitempty"`
 	ShopName    string `json:"shop_name" form:"shop_name" binding:"omitempty"`
 	ShopAddress string `json:"shop_address" form:"shop_address" binding:"omitempty"`
 	Description string `json:"description" form:"description" binding:"omitempty"`

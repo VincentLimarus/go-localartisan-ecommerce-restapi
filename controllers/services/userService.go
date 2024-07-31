@@ -116,11 +116,11 @@ func ChangePasswordUser(c *gin.Context){
 
 func UserService(router *gin.RouterGroup) {
 	router.GET("/users", GetAllUser)
-	router.GET("/users/:id", GetUserByID)
-	router.POST("/users/register", RegisterUser)
-	router.POST("/users/login", LoginUser)
+	router.GET("/user/:id", GetUserByID)
+	router.POST("/user/register", RegisterUser)
+	router.POST("/user/login", LoginUser)
 	
-	router.POST("/users/update", UpdateUser)
-	router.POST("/users/delete", DeleteUser)
-	router.POST("/users/change-password", ChangePasswordUser)
+	router.POST("/user/update", UpdateUser)
+	router.POST("/user/delete", DeleteUser)
+	router.POST("/user/change-password", ChangePasswordUser)
 }

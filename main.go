@@ -15,10 +15,10 @@ func init() {
 // @version 1.0
 // @description This is the API for Local Artisans
 // @BasePath /api/v1
-// @AuthPath /api/v1/auth
+// @AuthPath /api/v1/auth -> coming soon
 func main() {
 	db := configs.GetDB()
-	db.AutoMigrate(&database.User{})
+	db.AutoMigrate(&database.User{}, &database.Artisans{}, &database.Categories{})
 
 	r := routers.RoutersConfiguration()
 	r.Run(":3000")
