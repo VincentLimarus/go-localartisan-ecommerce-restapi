@@ -18,7 +18,7 @@ func init() {
 // @AuthPath /api/v1/auth
 func main() {
 	db := configs.GetDB()
-	db.AutoMigrate(&database.User{})
+	db.AutoMigrate(&database.User{}, &database.Artisans{})
 
 	r := routers.RoutersConfiguration()
 	r.Run(":3000")

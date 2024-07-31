@@ -30,6 +30,7 @@ func RoutersConfiguration() *gin.Engine{
 
 	base := router.Group("api/v1")
 	services.UserService(base)
+	services.ArtisanService(base)
 	
 	return router
 }

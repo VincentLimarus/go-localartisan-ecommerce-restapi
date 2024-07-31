@@ -289,16 +289,24 @@ func UpdateUser(UpdateUserRequestDTO requestsDTO.UpdateUserRequestDTO) (int, int
 		user.Address = UpdateUserRequestDTO.Address
 	}
 
+	if UpdateUserRequestDTO.IsActive != user.IsActive {
+		user.IsActive = UpdateUserRequestDTO.IsActive
+	}
+
+	if UpdateUserRequestDTO.UpdatedBy != "" {
+		user.UpdatedBy = UpdateUserRequestDTO.UpdatedBy
+	}
+
+	if UpdateUserRequestDTO.UpdatedBy == ""{
+		user.UpdatedBy = "User"
+	}
+
 	if err := db.Save(&user).Error; err != nil {
 		output := outputs.InternalServerErrorOutput{
 			Code: 500,
 			Message: fmt.Sprintf("Internal Server Error: %v", err),
 		}
 		return 500, output
-	}
-
-	if UpdateUserRequestDTO.UpdatedBy == ""{
-		user.UpdatedBy = "User"
 	}
 	
 	output := outputs.UpdateUserOutput{}
