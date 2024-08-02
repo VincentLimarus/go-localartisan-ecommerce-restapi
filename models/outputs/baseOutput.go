@@ -44,3 +44,13 @@ type ServiceUnavailableOutput struct {
 	Code    int    `json:"code" default:"503"`
 	Message string `json:"message" default:"Service Unavailable: {message}"`
 }
+
+type ConflictOutput struct {
+	Code    int    `json:"code" default:"409"`
+	Message string `json:"message" default:"Conflict: {message}"`
+}
+
+type RequestTimeoutOutput struct {
+	Code    int    `json:"code" default:"408"`
+	Message string `json:"message" default:"Request Timeout: {message}"`
+}
