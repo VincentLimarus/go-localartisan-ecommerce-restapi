@@ -28,7 +28,7 @@ func GetAllArtisans(c *gin.Context){
 	c.JSON(code, output)
 }
 
-func GetArtisanByID(c *gin.Context){
+func GetArtisan(c *gin.Context) {
 	artisanID := c.Param("id")
 
 	if _, err := uuid.Parse(artisanID); err != nil {
@@ -39,12 +39,14 @@ func GetArtisanByID(c *gin.Context){
 		c.JSON(http.StatusBadRequest, output)
 		return
 	}
+	
 	code, output := helpers.GetArtisan(artisanID)
 	c.JSON(code, output)
 }
 
 func RegisterArtisan(c *gin.Context){
 	var RegisterArtisanRequestDTO requestsDTO.RegisterArtisanRequestDTO
+	var UserInformation requestsDTO.UserInformation
 
 	if err := c.ShouldBindJSON(&RegisterArtisanRequestDTO); err != nil {
 		output := outputs.BadRequestOutput{
@@ -54,7 +56,7 @@ func RegisterArtisan(c *gin.Context){
 		c.JSON(http.StatusBadRequest, output)
 		return
 	}
-	code, output := helpers.RegisterArtisan(RegisterArtisanRequestDTO)
+	code, output := helpers.RegisterArtisan(RegisterArtisanRequestDTO, UserInformation)
 	c.JSON(code, output)
 }
 
@@ -90,7 +92,7 @@ func DeleteArtisan(c *gin.Context){
 
 func ArtisanService(router *gin.RouterGroup) {
 	router.GET("/artisans", GetAllArtisans)
-	router.GET("/artisan/:id", GetArtisanByID)
+	router.GET("/artisan/:id", GetArtisan)
 	router.POST("/artisan/register", RegisterArtisan)
 	router.POST("/artisan/update", UpdateArtisan)
 	router.POST("/artisan/delete", DeleteArtisan)

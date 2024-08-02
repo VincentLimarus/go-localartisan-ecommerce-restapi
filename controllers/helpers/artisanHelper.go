@@ -8,6 +8,8 @@ import (
 	"localArtisans/models/requestsDTO"
 	"localArtisans/models/responsesDTO"
 	"localArtisans/utils"
+
+	"github.com/google/uuid"
 )
 
 func GetAllArtisans(GetAllArtisansRequestDTO requestsDTO.GetAllArtisansRequestDTO) (int, interface{}) {
@@ -82,50 +84,89 @@ func GetAllArtisans(GetAllArtisansRequestDTO requestsDTO.GetAllArtisansRequestDT
 	return 200, output
 }
 
-func GetArtisan(ArtisanID string) (int, interface{}) {
+func GetArtisan(artisanID string) (int, interface{}) {
 	db := configs.GetDB()
 	var artisan database.Artisans
+	var user database.User
 
-	err := db.Table("artisans").Where("id = ?", ArtisanID).First(&artisan).Error
+	err := db.Table("artisans").
+		Joins("JOIN users ON users.id = artisans.user_id").
+		Where("artisans.id = ?", utils.StringToUUID(artisanID)).
+		Select("artisans.*, users.id as user_id, users.name as user_name, users.email as user_email, users.phone_number as user_phone, users.address as user_address, users.is_active as user_is_active, users.created_by as user_created_by, users.updated_by as user_updated_by, users.created_at as user_created_at, users.updated_at as user_updated_at").
+		First(&artisan).Error
 
-	if err != nil{
+	if err != nil {
 		output := outputs.InternalServerErrorOutput{
-			Code: 500,
-			Message: "Internal Server error" + err.Error(),
+			Code:    500,
+			Message: "Internal Server Error: " + err.Error(),
 		}
 		return 500, output
 	}
 
-	if artisan.ID == (database.Artisans{}).ID{
+	if artisan.ID == uuid.Nil {
 		output := outputs.NotFoundOutput{
-			Code: 404,
-			Message: "Not Found: Artisan not exist",
+			Code:    404,
+			Message: "Not Found: Artisan does not exist",
 		}
 		return 404, output
+	}
+
+	user.ID = artisan.UserID
+	err = db.Table("users").Where("id = ?", artisan.UserID).First(&user).Error
+	
+	if err != nil {
+		output := outputs.InternalServerErrorOutput{
+			Code:    500,
+			Message: "Internal Server Error: " + err.Error(),
+		}
+		return 500, output
 	}
 
 	output := outputs.GetArtisanOutput{}
 	output.Code = 200
 	output.Message = "Success: Artisan Found"
 	output.Data = responsesDTO.ArtisansResponseDTO{
-		ID: artisan.ID,
-		UserID: artisan.UserID,
-		ShopName: artisan.ShopName,
+		ID:          artisan.ID,
+		UserID:      artisan.UserID,
+		ShopName:    artisan.ShopName,
 		ShopAddress: artisan.ShopAddress,
 		Description: artisan.Description,
-		ShopBanner: artisan.ShopBanner,
-		Rating: artisan.Rating,
-		IsActive: artisan.IsActive,
-		CreatedBy: artisan.CreatedBy,
-		UpdatedBy: artisan.UpdatedBy,
-		CreatedAt: artisan.CreatedAt,
-		UpdatedAt: artisan.UpdatedAt,
+		ShopBanner:  artisan.ShopBanner,
+		Rating:      artisan.Rating,
+		IsActive:    artisan.IsActive,
+		CreatedBy:   artisan.CreatedBy,
+		UpdatedBy:   artisan.UpdatedBy,
+		CreatedAt:   artisan.CreatedAt,
+		UpdatedAt:   artisan.UpdatedAt,
+		User: responsesDTO.UserResponseDTO{
+			ID:         user.ID,
+			Name:       user.Name,
+			Email:      user.Email,
+			PhoneNumber: user.PhoneNumber,
+			Address:    user.Address,
+			IsActive:   user.IsActive,
+			CreatedBy:  user.CreatedBy,
+			UpdatedBy:  user.UpdatedBy,
+			CreatedAt:  user.CreatedAt,
+			UpdatedAt:  user.UpdatedAt,
+		},
 	}
 	return 200, output
 }
 
-func RegisterArtisan(RegisterArtisanRequestDTO requestsDTO.RegisterArtisanRequestDTO) (int, interface{}) {
+func RegisterArtisan(RegisterArtisanRequestDTO requestsDTO.RegisterArtisanRequestDTO, UserInformation requestsDTO.UserInformation) (int, interface{}) {
 	db := configs.GetDB()
+
+	joinErr := db.Table("users").Where("id = ?", RegisterArtisanRequestDTO.UserID).First(&UserInformation).Joins("artisans", "users.id = artisans.user_id").Error
+
+	if joinErr != nil{
+		output := outputs.InternalServerErrorOutput{
+			Code: 500,
+			Message: "Internal Server Error" + joinErr.Error(),
+		}
+		return 500, output
+	}
+
 	artisan := database.Artisans{
 		UserID: RegisterArtisanRequestDTO.UserID,
 		ShopName: RegisterArtisanRequestDTO.ShopName,
@@ -135,6 +176,17 @@ func RegisterArtisan(RegisterArtisanRequestDTO requestsDTO.RegisterArtisanReques
 		IsActive: RegisterArtisanRequestDTO.IsActive,
 		CreatedBy: RegisterArtisanRequestDTO.CreatedBy,
 		UpdatedBy: RegisterArtisanRequestDTO.CreatedBy,
+	}
+	
+	user := database.User{
+		ID: RegisterArtisanRequestDTO.UserID,
+		Name : UserInformation.Name,
+		Email: UserInformation.Email,
+		PhoneNumber : UserInformation.PhoneNumber,
+		Address : UserInformation.Address,
+		IsActive : UserInformation.IsActive,
+		CreatedBy : UserInformation.CreatedBy,
+		UpdatedBy : UserInformation.CreatedBy,
 	}
 
 	err := db.Create(&artisan).Error
@@ -162,6 +214,18 @@ func RegisterArtisan(RegisterArtisanRequestDTO requestsDTO.RegisterArtisanReques
 		UpdatedBy: artisan.UpdatedBy,
 		CreatedAt: artisan.CreatedAt,
 		UpdatedAt: artisan.UpdatedAt,
+		User: responsesDTO.UserResponseDTO{
+			ID: user.ID,
+			Name: user.Name,
+			Email: user.Email,
+			PhoneNumber: user.PhoneNumber,
+			Address: user.Address,
+			IsActive: user.IsActive,
+			CreatedBy: user.CreatedBy,
+			UpdatedBy: user.UpdatedBy,
+			CreatedAt: user.CreatedAt,
+			UpdatedAt: user.UpdatedAt,
+		},
 	}
 	return 200, output
 }
