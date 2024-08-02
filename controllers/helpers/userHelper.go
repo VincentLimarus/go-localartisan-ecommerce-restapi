@@ -104,7 +104,7 @@ func GetUser(userID string) (int, interface{}) {
 		return 500, output
 	}
 
-	if user.ID == (database.User{}).ID {
+	if user.ID == uuid.Nil {
 		output := outputs.NotFoundOutput{
 			Code: 404,
 			Message: "Not Found: Data not found",

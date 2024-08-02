@@ -32,6 +32,7 @@ func RoutersConfiguration() *gin.Engine{
 	services.UserService(base)
 	services.ArtisanService(base)
 	services.CategoryService(base)
-	
+	services.ProductService(base)
+
 	return router
 }
