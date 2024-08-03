@@ -17,18 +17,10 @@ func GetAllUser(GetAllUsersRequestDTO requestsDTO.GetAllUsersRequestDTO) (int, i
 	db := configs.GetDB()
 	var users []database.User
 
-	if GetAllUsersRequestDTO.Limit == 0 {
+	if GetAllUsersRequestDTO.Limit == 0 || GetAllUsersRequestDTO.Limit > 100{
 		output := outputs.BadRequestOutput{
 			Code: 400,
 			Message: "Bad Request: Limit cannot be 0",
-		}
-		return 400, output
-	}
-	
-	if GetAllUsersRequestDTO.Limit > 100 {
-		output := outputs.BadRequestOutput{
-			Code: 400,
-			Message: "Bad Request: Limit cannot be more than 100",
 		}
 		return 400, output
 	}
@@ -202,7 +194,7 @@ func RegisterUser(RegisterUserRequestDTO requestsDTO.RegisterUserRequestDTO) (in
 		return 200, output
 }
 
-func LoginUser(LoginUserRequestDTO requestsDTO.LoginUserRequestDTO) (int, interface{}) {
+func LoginUser(LoginUserRequestDTO requestsDTO.LoginUserRequestDTO) (int, interface{}, string) {
 	db := configs.GetDB()
 	var user database.User
 	err := db.Where("email = ?", LoginUserRequestDTO.Email).First(&user).Error
@@ -212,7 +204,17 @@ func LoginUser(LoginUserRequestDTO requestsDTO.LoginUserRequestDTO) (int, interf
 			Code: 500,
 			Message: fmt.Sprintf("Internal Server Error: %v", err),
 		}
-		return 500, output
+		return 500, output, err.Error()
+	}
+	
+	token, tokenErr := utils.CreateJWTToken(user.ID)
+
+	if tokenErr != nil{
+		output := outputs.InternalServerErrorOutput{
+			Code: 500,
+			Message: fmt.Sprintf("Internal Server Error: %v", tokenErr),
+		}
+		return 500, output, tokenErr.Error()
 	}
 
 	if user.ID == (database.User{}).ID {
@@ -220,7 +222,7 @@ func LoginUser(LoginUserRequestDTO requestsDTO.LoginUserRequestDTO) (int, interf
 			Code: 404,
 			Message: "Not Found: Data not found",
 		}
-		return 404, output
+		return 404, output, "Token not found"
 	}
 
 	if !utils.ComparePassword(user.Password, LoginUserRequestDTO.Password ) {
@@ -228,7 +230,7 @@ func LoginUser(LoginUserRequestDTO requestsDTO.LoginUserRequestDTO) (int, interf
 			Code: 400,
 			Message: "Bad Request: Password is incorrect",
 		}
-		return 400, output
+		return 400, output, "Token not found"
 	}
 
 	output := outputs.LoginUserOutput{
@@ -249,7 +251,7 @@ func LoginUser(LoginUserRequestDTO requestsDTO.LoginUserRequestDTO) (int, interf
 			UpdatedAt: user.UpdatedAt,
 		},
 	}
-	return 200, output
+	return 200, output, token
 }
 
 func UpdateUser(UpdateUserRequestDTO requestsDTO.UpdateUserRequestDTO) (int, interface{}) {	

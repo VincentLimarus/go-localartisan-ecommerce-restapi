@@ -90,10 +90,14 @@ func DeleteArtisan(c *gin.Context){
 	c.JSON(code, output)
 }
 
-func ArtisanService(router *gin.RouterGroup) {
+func BaseArtisanService(router *gin.RouterGroup) {
 	router.GET("/artisans", GetAllArtisans)
 	router.GET("/artisan/:id", GetArtisan)
+}
+
+func AuthArtisanService(router *gin.RouterGroup) {
 	router.POST("/artisan/register", RegisterArtisan)
 	router.POST("/artisan/update", UpdateArtisan)
 	router.POST("/artisan/delete", DeleteArtisan)
 }
+

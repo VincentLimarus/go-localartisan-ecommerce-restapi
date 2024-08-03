@@ -88,9 +88,12 @@ func DeleteCategory(c *gin.Context){
 	c.JSON(code, output)
 }
 
-func CategoryService(router *gin.RouterGroup) {
+func BaseCategoryService(router *gin.RouterGroup) {
 	router.GET("/categories", GetAllCategories)
 	router.GET("/category/:id", GetCategory)
+}
+
+func AuthCategoryService(router *gin.RouterGroup) {
 	router.POST("/category/create", CreateCategory)
 	router.POST("/category/update", UpdateCategory)
 	router.POST("/category/delete", DeleteCategory)

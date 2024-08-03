@@ -28,11 +28,23 @@ func RoutersConfiguration() *gin.Engine{
 		c.JSON(http.StatusOK, gin.H{"Code": 400, "message": "This is the local artisans API V1 Documentation, for more information please visit /api/v1/docs"}) // Docs will be added later
 	})
 
+	router.GET("/api/v1/docs", func (c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{"Code": 400, "message": "Documentation will be added soon"}) // Docs will be added later
+	})
+
+	// --------------- Base Routes ----------------
 	base := router.Group("api/v1")
-	services.UserService(base)
-	services.ArtisanService(base)
-	services.CategoryService(base)
-	services.ProductService(base)
+	services.BaseUserService(base)
+	services.BaseProductService(base)
+	services.BaseArtisanService(base)
+	services.BaseCategoryService(base)
+	// --------------- Authenticated Routes ----------------
+	auth := router.Group("api/v1")
+	auth.Use(middlewares.RequiredAuth())
+	services.AuthUserService(auth)
+	services.AuthProductService(auth)
+	services.AuthArtisanService(auth)
+	services.AuthCategoryService(auth)
 
 	return router
 }

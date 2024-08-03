@@ -15,6 +15,13 @@ func HashPassword(password string) (string, error) {
 	return string(hash), err
 }
 
+// Use only for testing and debugging purposes, not for production
+// Keep in mind that this function is not safe for production
+func CheckHashPassword(hash string, password string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	return err == nil
+}
+
 func ComparePassword(hash string, password string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 	return err == nil
@@ -53,5 +60,6 @@ func PaginationHandler(page int, limit int, order_by string, order_type string) 
 	limit = LimitHandler(limit)
 	order_by = OrderByHandler(order_by)
 	order_type = OrderTypeHandler(order_type)
+
 	return page, limit, order_by, order_type
 }

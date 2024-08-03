@@ -68,7 +68,9 @@ func LoginUser(c *gin.Context){
 		c.JSON(http.StatusBadRequest, output)
 		return
 	}
-	code , output := helpers.LoginUser(LoginUserRequestDTO)
+	code , output, token := helpers.LoginUser(LoginUserRequestDTO)
+	c.SetCookie("Authorization", token, 3600*12, "/", "localhost", true, true)
+	c.SetSameSite(http.StatusOK)
 	c.JSON(code, output)
 }
 
@@ -114,12 +116,14 @@ func ChangePasswordUser(c *gin.Context){
 	c.JSON(code, output)
 }
 
-func UserService(router *gin.RouterGroup) {
-	router.GET("/users", GetAllUser)
-	router.GET("/user/:id", GetUserByID)
+func BaseUserService(router *gin.RouterGroup) {
 	router.POST("/user/register", RegisterUser)
 	router.POST("/user/login", LoginUser)
-	
+}
+
+func AuthUserService(router *gin.RouterGroup) {
+	router.GET("/users", GetAllUser)
+	router.GET("/user/:id", GetUserByID)
 	router.POST("/user/update", UpdateUser)
 	router.POST("/user/delete", DeleteUser)
 	router.POST("/user/change-password", ChangePasswordUser)

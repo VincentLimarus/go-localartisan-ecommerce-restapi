@@ -88,10 +88,13 @@ func DeleteProduct(c *gin.Context){
 	c.JSON(code, output)
 }
 
-func ProductService(router *gin.RouterGroup) {
+func BaseProductService(router *gin.RouterGroup) {
 	router.GET("/products", GetAllProduct)
 	router.GET("/product/:id", GetProductByID)
+}
+
+func AuthProductService(router *gin.RouterGroup) {
 	router.POST("/product/create", CreateProduct)
 	router.POST("/product/update", UpdateProduct)
-	router.POST("/product/delete", DeleteProduct)
+	router.POST("/product/delete, DeleteProduct")
 }
