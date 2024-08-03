@@ -1,4 +1,5 @@
-FROM golang:1.20-alpine AS builder
+# docker buildx build --platform linux/amd64 -t vincentlim27/localartisansv1 . --push
+FROM golang:1.22-alpine AS builder
 
 RUN apk update && apk add --no-cache git
 
@@ -19,5 +20,6 @@ COPY --from=builder /app/main .
 
 EXPOSE 3000
 
-CMD ["go", "run", "main.go"]
+CMD ["./main"]
 
+# docker pull vincentlim27/localartisansv1

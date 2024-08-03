@@ -89,16 +89,16 @@ func GetArtisan(artisanID string) (int, interface{}) {
 	var artisan database.Artisans
 	var user database.User
 
-	err := db.Table("artisans").
+	joinErr := db.Table("artisans").
 		Joins("JOIN users ON users.id = artisans.user_id").
 		Where("artisans.id = ?", utils.StringToUUID(artisanID)).
 		Select("artisans.*, users.id as user_id, users.name as user_name, users.email as user_email, users.phone_number as user_phone, users.address as user_address, users.is_active as user_is_active, users.created_by as user_created_by, users.updated_by as user_updated_by, users.created_at as user_created_at, users.updated_at as user_updated_at").
 		First(&artisan).Error
 
-	if err != nil {
+	if joinErr != nil {
 		output := outputs.InternalServerErrorOutput{
 			Code:    500,
-			Message: "Internal Server Error: " + err.Error(),
+			Message: "Internal Server Error: " + joinErr.Error(),
 		}
 		return 500, output
 	}
@@ -112,7 +112,7 @@ func GetArtisan(artisanID string) (int, interface{}) {
 	}
 
 	user.ID = artisan.UserID
-	err = db.Table("users").Where("id = ?", artisan.UserID).First(&user).Error
+	err := db.Table("users").Where("id = ?", artisan.UserID).First(&user).Error
 	
 	if err != nil {
 		output := outputs.InternalServerErrorOutput{
@@ -190,6 +190,7 @@ func RegisterArtisan(RegisterArtisanRequestDTO requestsDTO.RegisterArtisanReques
 	}
 
 	err := db.Create(&artisan).Error
+
 	if err != nil{
 		output := outputs.InternalServerErrorOutput{
 			Code: 500,

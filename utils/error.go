@@ -50,3 +50,12 @@ func HandleInternalServerError(err error) (int, interface{}) {
 	}
 	return 500, output
 }
+
+func HandleServiceUnavailable(err error) (int, interface{}) {
+	output := outputs.ServiceUnavailableOutput{
+		Code:    503,
+		Message: "Service Unavailable: " + err.Error(),
+	}
+	return 503, output
+}
+

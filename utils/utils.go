@@ -15,13 +15,6 @@ func HashPassword(password string) (string, error) {
 	return string(hash), err
 }
 
-// Use only for testing and debugging purposes, not for production
-// Keep in mind that this function is not safe for production
-func CheckHashPassword(hash string, password string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
-	return err == nil
-}
-
 func ComparePassword(hash string, password string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 	return err == nil

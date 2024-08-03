@@ -225,7 +225,7 @@ func LoginUser(LoginUserRequestDTO requestsDTO.LoginUserRequestDTO) (int, interf
 		return 404, output, "Token not found"
 	}
 
-	if !utils.ComparePassword(user.Password, LoginUserRequestDTO.Password ) {
+	if !utils.ComparePassword(user.Password, LoginUserRequestDTO.Password) {
 		output := outputs.BadRequestOutput{
 			Code: 400,
 			Message: "Bad Request: Password is incorrect",
