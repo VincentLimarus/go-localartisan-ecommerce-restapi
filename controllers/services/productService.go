@@ -96,5 +96,5 @@ func BaseProductService(router *gin.RouterGroup) {
 func AuthProductService(router *gin.RouterGroup) {
 	router.POST("/product/create", CreateProduct)
 	router.POST("/product/update", UpdateProduct)
-	router.POST("/product/delete, DeleteProduct")
+	router.POST("/product/delete", DeleteProduct)
 }
