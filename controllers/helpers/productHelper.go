@@ -7,6 +7,8 @@ import (
 	"localArtisans/models/outputs"
 	"localArtisans/models/requestsDTO"
 	"localArtisans/models/responsesDTO"
+
+	"github.com/google/uuid"
 )
 
 func GetAllProduct(GetAllProductRequestDTO requestsDTO.GetAllProductRequestDTO) (int, interface{}) {
@@ -182,18 +184,31 @@ func UpdateProduct(UpdateProductRequestDTO requestsDTO.UpdateProductRequestDTO) 
 		return 404, output
 	}
 
-	product.Name = UpdateProductRequestDTO.Name
-	product.Price = UpdateProductRequestDTO.Price
-	product.Description = UpdateProductRequestDTO.Description
-	product.Quantity = UpdateProductRequestDTO.Quantity
-	product.CategoryID = UpdateProductRequestDTO.CategoryID
-	product.ArtisanID = UpdateProductRequestDTO.ArtisanID
-	product.UpdatedBy = UpdateProductRequestDTO.UpdatedBy
-	product.IsActive = UpdateProductRequestDTO.IsActive
-
-	if product.UpdatedBy == "" {
-		product.UpdatedBy = "user"
+	if UpdateProductRequestDTO.Name != "" {
+		product.Name = UpdateProductRequestDTO.Name
 	}
+	if UpdateProductRequestDTO.Price != 0 {
+		product.Price = UpdateProductRequestDTO.Price
+	}
+	if UpdateProductRequestDTO.Description != "" {
+		product.Description = UpdateProductRequestDTO.Description
+	}
+	if UpdateProductRequestDTO.Quantity != 0 {
+		product.Quantity = UpdateProductRequestDTO.Quantity
+	}
+	if UpdateProductRequestDTO.CategoryID != uuid.Nil {
+		product.CategoryID = UpdateProductRequestDTO.CategoryID
+	}
+	if UpdateProductRequestDTO.ArtisanID != uuid.Nil {
+		product.ArtisanID = UpdateProductRequestDTO.ArtisanID
+	}
+	if UpdateProductRequestDTO.UpdatedBy == "" {
+		product.UpdatedBy = "user"
+	} else{
+		product.UpdatedBy = UpdateProductRequestDTO.UpdatedBy
+	}
+
+	product.IsActive = UpdateProductRequestDTO.IsActive
 
 	err = db.Save(&product).Error
 

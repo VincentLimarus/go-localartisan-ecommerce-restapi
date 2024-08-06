@@ -290,18 +290,14 @@ func UpdateUser(UpdateUserRequestDTO requestsDTO.UpdateUserRequestDTO) (int, int
 	if UpdateUserRequestDTO.Address != "" {
 		user.Address = UpdateUserRequestDTO.Address
 	}
-
-	if UpdateUserRequestDTO.IsActive != user.IsActive {
-		user.IsActive = UpdateUserRequestDTO.IsActive
-	}
-
-	if UpdateUserRequestDTO.UpdatedBy != "" {
+	
+	if UpdateUserRequestDTO.UpdatedBy == "" {
+		user.UpdatedBy = "User"
+	} else {
 		user.UpdatedBy = UpdateUserRequestDTO.UpdatedBy
 	}
-
-	if UpdateUserRequestDTO.UpdatedBy == ""{
-		user.UpdatedBy = "User"
-	}
+	
+	user.IsActive = UpdateUserRequestDTO.IsActive
 
 	if err := db.Save(&user).Error; err != nil {
 		output := outputs.InternalServerErrorOutput{

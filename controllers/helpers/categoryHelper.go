@@ -153,14 +153,19 @@ func UpdateCategory(UpdateCategoryRequestDTO requestsDTO.UpdateCategoryRequestDT
 		return 404, output
 	}
 
-	category.Name = UpdateCategoryRequestDTO.Name
-	category.Image = UpdateCategoryRequestDTO.Image
-	category.IsActive = UpdateCategoryRequestDTO.IsActive
-	category.UpdatedBy = UpdateCategoryRequestDTO.UpdatedBy
-
-	if category.UpdatedBy == "" {
-		category.UpdatedBy = "user"
+	if UpdateCategoryRequestDTO.Name != "" {
+		category.Name = UpdateCategoryRequestDTO.Name
 	}
+	if UpdateCategoryRequestDTO.Image != "" {
+		category.Image = UpdateCategoryRequestDTO.Image
+	}
+	if UpdateCategoryRequestDTO.UpdatedBy == "" {
+		category.UpdatedBy = "user"
+	} else{
+		category.UpdatedBy = UpdateCategoryRequestDTO.UpdatedBy
+	}
+
+	category.IsActive = UpdateCategoryRequestDTO.IsActive
 
 	err = db.Save(&category).Error
 	if err != nil {

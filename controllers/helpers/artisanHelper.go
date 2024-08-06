@@ -253,16 +253,27 @@ func UpdateArtisan(UpdateArtisanRequestDTO requestsDTO.UpdateArtisanRequestDTO) 
 		return 404, output
 	}
 
-	artisan.UserID = UpdateArtisanRequestDTO.UserID
-	artisan.ShopName = UpdateArtisanRequestDTO.ShopName
-	artisan.ShopAddress = UpdateArtisanRequestDTO.ShopAddress
-	artisan.Description = UpdateArtisanRequestDTO.Description
-	artisan.ShopBanner = UpdateArtisanRequestDTO.ShopBanner
 	artisan.IsActive = UpdateArtisanRequestDTO.IsActive
-	artisan.UpdatedBy = UpdateArtisanRequestDTO.UpdatedBy
 	
-	if artisan.UpdatedBy == ""{
+	if UpdateArtisanRequestDTO.UserID != uuid.Nil{
+		artisan.UserID = UpdateArtisanRequestDTO.UserID
+	}
+	if UpdateArtisanRequestDTO.ShopName != ""{
+		artisan.ShopName = UpdateArtisanRequestDTO.ShopName
+	}
+	if UpdateArtisanRequestDTO.ShopAddress != ""{
+		artisan.ShopAddress = UpdateArtisanRequestDTO.ShopAddress
+	}
+	if UpdateArtisanRequestDTO.Description != ""{
+		artisan.Description = UpdateArtisanRequestDTO.Description
+	}
+	if UpdateArtisanRequestDTO.ShopBanner != ""{
+		artisan.ShopBanner = UpdateArtisanRequestDTO.ShopBanner
+	}
+	if UpdateArtisanRequestDTO.UpdatedBy == ""{
 		artisan.UpdatedBy = "user"
+	}else{
+		artisan.UpdatedBy = UpdateArtisanRequestDTO.UpdatedBy
 	}
 	
 	err = db.Save(&artisan).Error
