@@ -28,6 +28,7 @@ func GetAllArtisans(GetAllArtisansRequestDTO requestsDTO.GetAllArtisansRequestDT
 	order := fmt.Sprintf("%s %s", GetAllArtisansRequestDTO.OrderBy, GetAllArtisansRequestDTO.OrderType)
 	err := db.Offset(offset).Limit(GetAllArtisansRequestDTO.Limit).Order(order).Find(&artisans).Error
 
+
 	if err != nil{
 		output := outputs.InternalServerErrorOutput{
 			Code: 500,
@@ -79,6 +80,9 @@ func GetAllArtisans(GetAllArtisansRequestDTO requestsDTO.GetAllArtisansRequestDT
 			UpdatedBy: artisan.UpdatedBy,
 			CreatedAt: artisan.CreatedAt,
 			UpdatedAt: artisan.UpdatedAt,
+			User: responsesDTO.UserResponseDTO{
+				ID: artisan.UserID,
+			},
 		})
 	}
 	return 200, output
@@ -98,7 +102,7 @@ func GetArtisan(artisanID string) (int, interface{}) {
 	if joinErr != nil {
 		output := outputs.InternalServerErrorOutput{
 			Code:    500,
-			Message: "Internal Server Error: " + joinErr.Error(),
+			Message: "Internal Server Error {Error Join Query}: " + joinErr.Error(),
 		}
 		return 500, output
 	}
@@ -156,13 +160,13 @@ func GetArtisan(artisanID string) (int, interface{}) {
 
 func RegisterArtisan(RegisterArtisanRequestDTO requestsDTO.RegisterArtisanRequestDTO, UserInformation requestsDTO.UserInformation) (int, interface{}) {
 	db := configs.GetDB()
-
+	
 	joinErr := db.Table("users").Where("id = ?", RegisterArtisanRequestDTO.UserID).First(&UserInformation).Joins("artisans", "users.id = artisans.user_id").Error
 
 	if joinErr != nil{
 		output := outputs.InternalServerErrorOutput{
 			Code: 500,
-			Message: "Internal Server Error" + joinErr.Error(),
+			Message: "Internal Server Error {Error Join Query}" + joinErr.Error(),
 		}
 		return 500, output
 	}
@@ -187,6 +191,8 @@ func RegisterArtisan(RegisterArtisanRequestDTO requestsDTO.RegisterArtisanReques
 		IsActive : UserInformation.IsActive,
 		CreatedBy : UserInformation.CreatedBy,
 		UpdatedBy : UserInformation.CreatedBy,
+		CreatedAt: UserInformation.CreatedAt,
+		UpdatedAt: UserInformation.UpdatedAt,
 	}
 
 	err := db.Create(&artisan).Error
@@ -234,9 +240,23 @@ func RegisterArtisan(RegisterArtisanRequestDTO requestsDTO.RegisterArtisanReques
 func UpdateArtisan(UpdateArtisanRequestDTO requestsDTO.UpdateArtisanRequestDTO) (int, interface{}) {
 	db := configs.GetDB()
 	var artisan database.Artisans
+	var user database.User
 
+	joinErr := db.Table("users").
+		Joins("JOIN artisans ON users.id = artisans.user_id").
+		Where("users.id = ?", UpdateArtisanRequestDTO.UserID).
+		First(&user).Error
+
+	if joinErr != nil{
+		output := outputs.InternalServerErrorOutput{
+			Code: 500,
+			Message: "Internal Server Error {Error Join Query}" + joinErr.Error(),
+		}
+		return 500, output
+	}
+	
 	err := db.Where("id = ?", utils.StringToUUID(UpdateArtisanRequestDTO.ID)).First(&artisan).Error
-
+	
 	if err != nil{
 		output := outputs.InternalServerErrorOutput{
 			Code: 500,
@@ -301,6 +321,18 @@ func UpdateArtisan(UpdateArtisanRequestDTO requestsDTO.UpdateArtisanRequestDTO) 
 		UpdatedBy: artisan.UpdatedBy,
 		CreatedAt: artisan.CreatedAt,
 		UpdatedAt: artisan.UpdatedAt,
+		User: responsesDTO.UserResponseDTO{
+			ID: user.ID,
+			Name: user.Name,
+			Email: user.Email,
+			PhoneNumber: user.PhoneNumber,
+			Address: user.Address,
+			IsActive: user.IsActive,
+			CreatedBy: user.CreatedBy,
+			UpdatedBy: user.UpdatedBy,
+			CreatedAt: user.CreatedAt,
+			UpdatedAt: user.UpdatedAt,
+		},
 	}
 	return 200, output
 }
@@ -308,6 +340,20 @@ func UpdateArtisan(UpdateArtisanRequestDTO requestsDTO.UpdateArtisanRequestDTO) 
 func DeleteArtisan(DeleteArtisanRequestDTO requestsDTO.DeleteArtisanRequestDTO) (int, interface{}) {
 	db := configs.GetDB()
 	var artisan database.Artisans
+	var user database.User
+
+	joinErr := db.Table("users").
+		Joins("JOIN artisans ON users.id = artisans.user_id").
+		Where("users.id = ?", DeleteArtisanRequestDTO.UserID).
+		First(&user).Error
+
+	if joinErr != nil{
+		output := outputs.InternalServerErrorOutput{
+			Code: 500,
+			Message: "Internal Server Error {Error Join Query} " + joinErr.Error(),
+		}
+		return 500, output
+	}	
 
 	err := db.Where("id = ?", utils.StringToUUID(DeleteArtisanRequestDTO.ID)).First(&artisan).Error
 
@@ -352,6 +398,18 @@ func DeleteArtisan(DeleteArtisanRequestDTO requestsDTO.DeleteArtisanRequestDTO) 
 		UpdatedBy: artisan.UpdatedBy,
 		CreatedAt: artisan.CreatedAt,
 		UpdatedAt: artisan.UpdatedAt,
+		User: responsesDTO.UserResponseDTO{
+			ID: artisan.UserID,
+			Name: user.Name,
+			Email: user.Email,
+			PhoneNumber: user.PhoneNumber,
+			Address: user.Address,
+			IsActive: user.IsActive,
+			CreatedBy: user.CreatedBy,
+			UpdatedBy: user.UpdatedBy,
+			CreatedAt: user.CreatedAt,
+			UpdatedAt: user.UpdatedAt,
+		},
 	}
 	
 	return 200, output

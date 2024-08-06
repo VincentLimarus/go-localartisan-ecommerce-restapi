@@ -1,6 +1,10 @@
 package requestsDTO
 
-import "time"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 type GetAllUsersRequestDTO struct {
 	Page      int    `json:"page" form:"page" binding:"omitempty"`
@@ -52,7 +56,7 @@ type ChangePasswordRequestDTO struct {
 }
 
 type UserInformation struct {
-	ID          string    `json:"id" form:"id" binding:"required"`
+	ID          uuid.UUID    `json:"id" form:"id" binding:"required"`
 	Name        string    `json:"name" form:"name" binding:"omitempty"`
 	Email       string    `json:"email" form:"email" binding:"omitempty"`
 	PhoneNumber string    `json:"phone_number" form:"phone_number" binding:"omitempty"`
