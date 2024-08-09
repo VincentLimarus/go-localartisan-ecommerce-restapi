@@ -15,4 +15,8 @@ type Categories struct {
 	UpdatedBy string    `gorm:"type:varchar(50);not null; default:'system'"`
 	CreatedAt time.Time `gorm:"autoCreateTime;not null;default:now()"`
 	UpdatedAt time.Time `gorm:"autoUpdateTime;not null;default:now()"`
+
+	// Start of FK
+	Products []Product `gorm:"foreignKey:CategoryID"`
+	// End of FK
 }

@@ -5,6 +5,7 @@ import (
 	"localArtisans/configs"
 	"localArtisans/models/database"
 	"localArtisans/models/outputs"
+	"localArtisans/models/repositories"
 	"localArtisans/models/requestsDTO"
 	"localArtisans/models/responsesDTO"
 	"localArtisans/utils"
@@ -80,29 +81,20 @@ func GetAllArtisans(GetAllArtisansRequestDTO requestsDTO.GetAllArtisansRequestDT
 			UpdatedBy: artisan.UpdatedBy,
 			CreatedAt: artisan.CreatedAt,
 			UpdatedAt: artisan.UpdatedAt,
-			User: responsesDTO.UserResponseDTO{
-				ID: artisan.UserID,
-			},
 		})
 	}
 	return 200, output
 }
 
 func GetArtisan(artisanID string) (int, interface{}) {
-	db := configs.GetDB()
+	// var user database.User
 	var artisan database.Artisans
-	var user database.User
 
-	joinErr := db.Table("artisans").
-		Joins("JOIN users ON users.id = artisans.user_id").
-		Where("artisans.id = ?", utils.StringToUUID(artisanID)).
-		Select("artisans.*, users.id as user_id, users.name as user_name, users.email as user_email, users.phone_number as user_phone, users.address as user_address, users.is_active as user_is_active, users.created_by as user_created_by, users.updated_by as user_updated_by, users.created_at as user_created_at, users.updated_at as user_updated_at").
-		First(&artisan).Error
-
-	if joinErr != nil {
+	artisan, err := repositories.GetArtisanByArtisanID(artisanID)
+	if err != nil {
 		output := outputs.InternalServerErrorOutput{
 			Code:    500,
-			Message: "Internal Server Error {Error Join Query}: " + joinErr.Error(),
+			Message: "Internal Server Error {Error GetArtisanByArtisanID}: " + err.Error(),
 		}
 		return 500, output
 	}
@@ -115,8 +107,20 @@ func GetArtisan(artisanID string) (int, interface{}) {
 		return 404, output
 	}
 
-	user.ID = artisan.UserID
-	err := db.Table("users").Where("id = ?", artisan.UserID).First(&user).Error
+	// user, err = repositories.GetUserByUserID(artisanID)
+	if err != nil {
+		output := outputs.InternalServerErrorOutput{
+			Code:    500,
+			Message: "Internal Server Error {Error GetUserByUserID}: " + err.Error(),
+		}
+		return 500, output
+	}
+
+	// joinErr := db.Table("artisans").
+	// 	Joins("JOIN users ON users.id = artisans.user_id").
+	// 	Where("artisans.id = ?", utils.StringToUUID(artisanID)).
+	// 	Select("artisans.*, users.id as user_id, users.name as user_name, users.email as user_email, users.phone_number as user_phone, users.address as user_address, users.is_active as user_is_active, users.created_by as user_created_by, users.updated_by as user_updated_by, users.created_at as user_created_at, users.updated_at as user_updated_at").
+	// 	First(&artisan).Error
 	
 	if err != nil {
 		output := outputs.InternalServerErrorOutput{
@@ -142,18 +146,7 @@ func GetArtisan(artisanID string) (int, interface{}) {
 		UpdatedBy:   artisan.UpdatedBy,
 		CreatedAt:   artisan.CreatedAt,
 		UpdatedAt:   artisan.UpdatedAt,
-		User: responsesDTO.UserResponseDTO{
-			ID:         user.ID,
-			Name:       user.Name,
-			Email:      user.Email,
-			PhoneNumber: user.PhoneNumber,
-			Address:    user.Address,
-			IsActive:   user.IsActive,
-			CreatedBy:  user.CreatedBy,
-			UpdatedBy:  user.UpdatedBy,
-			CreatedAt:  user.CreatedAt,
-			UpdatedAt:  user.UpdatedAt,
-		},
+
 	}
 	return 200, output
 }
@@ -181,19 +174,7 @@ func RegisterArtisan(RegisterArtisanRequestDTO requestsDTO.RegisterArtisanReques
 		CreatedBy: RegisterArtisanRequestDTO.CreatedBy,
 		UpdatedBy: RegisterArtisanRequestDTO.CreatedBy,
 	}
-	
-	user := database.User{
-		ID: RegisterArtisanRequestDTO.UserID,
-		Name : UserInformation.Name,
-		Email: UserInformation.Email,
-		PhoneNumber : UserInformation.PhoneNumber,
-		Address : UserInformation.Address,
-		IsActive : UserInformation.IsActive,
-		CreatedBy : UserInformation.CreatedBy,
-		UpdatedBy : UserInformation.CreatedBy,
-		CreatedAt: UserInformation.CreatedAt,
-		UpdatedAt: UserInformation.UpdatedAt,
-	}
+
 
 	err := db.Create(&artisan).Error
 
@@ -221,18 +202,7 @@ func RegisterArtisan(RegisterArtisanRequestDTO requestsDTO.RegisterArtisanReques
 		UpdatedBy: artisan.UpdatedBy,
 		CreatedAt: artisan.CreatedAt,
 		UpdatedAt: artisan.UpdatedAt,
-		User: responsesDTO.UserResponseDTO{
-			ID: user.ID,
-			Name: user.Name,
-			Email: user.Email,
-			PhoneNumber: user.PhoneNumber,
-			Address: user.Address,
-			IsActive: user.IsActive,
-			CreatedBy: user.CreatedBy,
-			UpdatedBy: user.UpdatedBy,
-			CreatedAt: user.CreatedAt,
-			UpdatedAt: user.UpdatedAt,
-		},
+
 	}
 	return 200, output
 }
@@ -321,18 +291,7 @@ func UpdateArtisan(UpdateArtisanRequestDTO requestsDTO.UpdateArtisanRequestDTO) 
 		UpdatedBy: artisan.UpdatedBy,
 		CreatedAt: artisan.CreatedAt,
 		UpdatedAt: artisan.UpdatedAt,
-		User: responsesDTO.UserResponseDTO{
-			ID: user.ID,
-			Name: user.Name,
-			Email: user.Email,
-			PhoneNumber: user.PhoneNumber,
-			Address: user.Address,
-			IsActive: user.IsActive,
-			CreatedBy: user.CreatedBy,
-			UpdatedBy: user.UpdatedBy,
-			CreatedAt: user.CreatedAt,
-			UpdatedAt: user.UpdatedAt,
-		},
+
 	}
 	return 200, output
 }
@@ -398,18 +357,7 @@ func DeleteArtisan(DeleteArtisanRequestDTO requestsDTO.DeleteArtisanRequestDTO) 
 		UpdatedBy: artisan.UpdatedBy,
 		CreatedAt: artisan.CreatedAt,
 		UpdatedAt: artisan.UpdatedAt,
-		User: responsesDTO.UserResponseDTO{
-			ID: artisan.UserID,
-			Name: user.Name,
-			Email: user.Email,
-			PhoneNumber: user.PhoneNumber,
-			Address: user.Address,
-			IsActive: user.IsActive,
-			CreatedBy: user.CreatedBy,
-			UpdatedBy: user.UpdatedBy,
-			CreatedAt: user.CreatedAt,
-			UpdatedAt: user.UpdatedAt,
-		},
+
 	}
 	
 	return 200, output

@@ -6,9 +6,11 @@ import (
 	"localArtisans/configs"
 	"localArtisans/models/database"
 	outputs "localArtisans/models/outputs"
+	"localArtisans/models/repositories"
 	"localArtisans/models/requestsDTO"
 	"localArtisans/models/responsesDTO"
 	"localArtisans/utils"
+	"log"
 
 	"github.com/google/uuid"
 )
@@ -17,10 +19,18 @@ func GetAllUser(GetAllUsersRequestDTO requestsDTO.GetAllUsersRequestDTO) (int, i
 	db := configs.GetDB()
 	var users []database.User
 
-	if GetAllUsersRequestDTO.Limit == 0 || GetAllUsersRequestDTO.Limit > 100{
+	if GetAllUsersRequestDTO.Limit == 0 {
 		output := outputs.BadRequestOutput{
 			Code: 400,
 			Message: "Bad Request: Limit cannot be 0",
+		}
+		return 400, output
+	}
+	
+	if GetAllUsersRequestDTO.Limit > 100 {
+		output := outputs.BadRequestOutput{
+			Code: 400,
+			Message: "Bad Request: Limit cannot be more than 100",
 		}
 		return 400, output
 	}
@@ -67,7 +77,8 @@ func GetAllUser(GetAllUsersRequestDTO requestsDTO.GetAllUsersRequestDTO) (int, i
 	output.TotalPage = totalPage
 	
 	for _, user := range users {
-		output.Data = append(output.Data, responsesDTO.UserResponseDTO{
+	
+		userResponse := responsesDTO.UserResponseDTO{
 			ID: user.ID,
 			Name: user.Name,
 			Email: user.Email,
@@ -78,15 +89,17 @@ func GetAllUser(GetAllUsersRequestDTO requestsDTO.GetAllUsersRequestDTO) (int, i
 			UpdatedBy: user.UpdatedBy,
 			CreatedAt: user.CreatedAt,
 			UpdatedAt: user.UpdatedAt,
-		})
+		}
+		output.Data = append(output.Data, userResponse)
 	}
+	
 	return 200, output
 }
 
+
 func GetUser(userID string) (int, interface{}) {
-	db := configs.GetDB()
 	var user database.User
-	err := db.Table("users").Where("id = ?", userID).First(&user).Error
+	user, err := repositories.GetUserByUserID(userID)
 
 	if err != nil {
 		output := outputs.InternalServerErrorOutput{
@@ -102,6 +115,10 @@ func GetUser(userID string) (int, interface{}) {
 			Message: "Not Found: Data not found",
 		}
 		return 404, output
+	}
+
+	if err != nil {
+		log.Println(("Artisan not found, This user is not an artisan"))
 	}
 
 	output := outputs.GetUserOutput{
@@ -197,6 +214,7 @@ func RegisterUser(RegisterUserRequestDTO requestsDTO.RegisterUserRequestDTO) (in
 func LoginUser(LoginUserRequestDTO requestsDTO.LoginUserRequestDTO) (int, interface{}, string) {
 	db := configs.GetDB()
 	var user database.User
+
 	err := db.Where("email = ?", LoginUserRequestDTO.Email).First(&user).Error
 
 	if err != nil {

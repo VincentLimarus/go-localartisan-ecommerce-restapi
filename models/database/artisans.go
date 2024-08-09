@@ -19,7 +19,8 @@ type Artisans struct {
 	UpdatedBy 	string 		`gorm:"type:varchar(50);not null; default:'system'"`
 	CreatedAt   time.Time 	`gorm:"autoCreateTime;not null;default:now()"`
 	UpdatedAt   time.Time 	`gorm:"autoUpdateTime;not null;default:now()"`
+
 	// Start of FK
-	User 		User 		`gorm:"foreignKey:UserID;references:ID"`
+	Products 	[]Product 	`gorm:"foreignKey:ArtisanID"`
 	// End of FK
 }	

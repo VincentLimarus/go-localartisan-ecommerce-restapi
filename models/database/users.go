@@ -18,4 +18,9 @@ type User struct {
 	UpdatedBy 	string 		`gorm:"type:varchar(50);not null; default:'system'"`
 	CreatedAt   time.Time 	`gorm:"autoCreateTime;not null;default:now()"`
 	UpdatedAt   time.Time 	`gorm:"autoUpdateTime;not null;default:now()"`
+
+	Artisans 	Artisans 	`gorm:"foreignKey:UserID"`
+	// Orders 		[]Orders 	`gorm:"foreignKey:UserID"`
+	// Carts 		[]Carts 	`gorm:"foreignKey:UserID"`
+	// Reviews 	[]Reviews 	`gorm:"foreignKey:UserID"`
 }

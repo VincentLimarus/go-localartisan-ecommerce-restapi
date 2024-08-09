@@ -20,5 +20,7 @@ type ArtisansResponseDTO struct {
 	CreatedAt   time.Time    `json:"created_at"`
 	UpdatedAt   time.Time    `json:"updated_at"`
 
-	User UserResponseDTO `json:"user"`
+	// Start of FK
+	Products []ProductResponseDTO `json:"products"`
+	// End of FK
 }

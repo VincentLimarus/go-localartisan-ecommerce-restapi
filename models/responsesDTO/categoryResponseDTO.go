@@ -15,4 +15,8 @@ type CategoryResponseDTO struct {
 	UpdatedBy string    `json:"updatedBy"`
 	CreatedAt time.Time `json:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt"`
+
+	// Start of FK
+	Products []ProductResponseDTO `json:"products"`
+	// End of FK
 }
