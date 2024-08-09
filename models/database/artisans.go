@@ -21,6 +21,5 @@ type Artisans struct {
 	UpdatedAt   time.Time 	`gorm:"autoUpdateTime;not null;default:now()"`
 	// Start of FK
 	User 		User 		`gorm:"foreignKey:UserID;references:ID"`
-	
 	// End of FK
 }	

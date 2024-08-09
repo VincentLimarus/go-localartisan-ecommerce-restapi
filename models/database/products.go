@@ -15,8 +15,8 @@ type Product struct {
 	ItemSold    int        `gorm:"type:int;not null;default:0"`
 	Rating      float64    `gorm:"type:decimal(2,1);not null;default:0.0"`
 	IsActive    bool       `gorm:"type:boolean;not null;default:true"`
-	CreatedBy   string     `gorm:"type:varchar(255);not null"`
-	UpdatedBy   string     `gorm:"type:varchar(255);not null"`
+	CreatedBy   string     `gorm:"type:varchar(255);not null; default:'system'"`
+	UpdatedBy   string     `gorm:"type:varchar(255);not null; default:'system'"`
 	CreatedAt   time.Time  `gorm:"type:timestamp;not null;default:now()"`
 	UpdatedAt   time.Time  `gorm:"type:timestamp;not null;default:now()"`
 
@@ -25,6 +25,6 @@ type Product struct {
 	Category    Categories   `gorm:"foreignKey:CategoryID"`
 
 	ArtisanID   uuid.UUID  `gorm:"type:uuid;not null"`
-	Artisan     Artisans    `gorm:"foreignKey:ArtisanID"`
+	Artisans     Artisans    `gorm:"foreignKey:ArtisanID"`
 	// End of FK
 }

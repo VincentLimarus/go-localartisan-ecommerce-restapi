@@ -23,4 +23,7 @@ type ProductResponseDTO struct {
 	CategoryName string   `json:"category_name"`
 	ArtisanID    uuid.UUID   `json:"artisan_id"`
 	ArtisanName  string   `json:"artisan_name"`
+
+	Categories CategoryResponseDTO `json:"category"`
+	Artisans  ArtisansResponseDTO `json:"artisan"`
 }

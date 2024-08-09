@@ -74,7 +74,7 @@ func GetAllProduct(GetAllProductRequestDTO requestsDTO.GetAllProductRequestDTO) 
 			CategoryID:  product.CategoryID,
 			CategoryName:product.Category.Name,
 			ArtisanID:   product.ArtisanID,
-			ArtisanName: product.Artisan.User.Name,
+			ArtisanName: product.Artisans.User.Name,
 			IsActive:    product.IsActive,
 			CreatedBy:   product.CreatedBy,
 			UpdatedBy:   product.UpdatedBy,
@@ -87,9 +87,14 @@ func GetAllProduct(GetAllProductRequestDTO requestsDTO.GetAllProductRequestDTO) 
 
 func GetProduct(productID string) (int, interface{}) {
 	db := configs.GetDB()
-	product := database.Product{}
+	var product database.Product
 
-	err := db.Table("products").Where("id = ?", productID).First(&product).Error
+	err := db.Table("products").
+		Joins("JOIN artisans a ON a.id = products.artisan_id").
+		Joins("JOIN categories c ON c.id = products.category_id").
+		Where("products.id = ?", productID).
+		Select("products.*, a.*, c.*").
+		First(&product).Error
 
 	if err != nil {
 		output := outputs.NotFoundOutput{
@@ -113,12 +118,47 @@ func GetProduct(productID string) (int, interface{}) {
 		CategoryID:  product.CategoryID,
 		CategoryName:product.Category.Name,
 		ArtisanID:   product.ArtisanID,
-		ArtisanName: product.Artisan.User.Name,
+		ArtisanName: product.Artisans.User.Name,
 		IsActive:    product.IsActive,
 		CreatedBy:   product.CreatedBy,
 		UpdatedBy:   product.UpdatedBy,
 		CreatedAt:   product.CreatedAt,
 		UpdatedAt:   product.UpdatedAt,
+		Artisans: responsesDTO.ArtisansResponseDTO{
+			ID:        product.Artisans.ID,
+			UserID:    product.Artisans.UserID,
+			ShopName: product.Artisans.ShopName,
+			ShopAddress: product.Artisans.ShopAddress,
+			Description: product.Artisans.Description,
+			ShopBanner: product.Artisans.ShopBanner,
+			Rating: product.Artisans.Rating,
+			User: responsesDTO.UserResponseDTO{
+				ID:       product.Artisans.User.ID,
+				Name:     product.Artisans.User.Name,
+				Email:    product.Artisans.User.Email,
+				Address: product.Artisans.User.Address,
+				PhoneNumber:    product.Artisans.User.PhoneNumber,
+				IsActive: product.Artisans.User.IsActive,
+				CreatedBy:product.Artisans.User.CreatedBy,
+				UpdatedBy:product.Artisans.User.UpdatedBy,
+				CreatedAt:product.Artisans.User.CreatedAt,
+				UpdatedAt:product.Artisans.User.UpdatedAt,
+			},
+			CreatedBy: product.Artisans.CreatedBy,
+			UpdatedBy: product.Artisans.UpdatedBy,	
+			CreatedAt: product.Artisans.CreatedAt,
+			UpdatedAt: product.Artisans.UpdatedAt,
+		},
+		Categories: responsesDTO.CategoryResponseDTO{
+			ID:        product.Category.ID,
+			Name:      product.Category.Name,
+			Image:    product.Category.Image,
+			IsActive:  product.Category.IsActive,
+			CreatedBy:product.Category.CreatedBy,
+			UpdatedBy:product.Category.UpdatedBy,
+			CreatedAt:product.Category.CreatedAt,
+			UpdatedAt:product.Category.UpdatedAt,
+		},
 	}
 	return 200, output
 }
@@ -160,7 +200,7 @@ func CreateProduct(CreateProductRequestDTO requestsDTO.CreateProductRequestDTO) 
 		CategoryID:  product.CategoryID,
 		CategoryName:product.Category.Name,
 		ArtisanID:   product.ArtisanID,
-		ArtisanName: product.Artisan.User.Name,
+		ArtisanName: product.Artisans.User.Name,
 		IsActive:    product.IsActive,
 		CreatedBy:   product.CreatedBy,
 		UpdatedBy:   product.UpdatedBy,
@@ -234,7 +274,7 @@ func UpdateProduct(UpdateProductRequestDTO requestsDTO.UpdateProductRequestDTO) 
 		CategoryID:  product.CategoryID,
 		CategoryName:product.Category.Name,
 		ArtisanID:   product.ArtisanID,
-		ArtisanName: product.Artisan.User.Name,
+		ArtisanName: product.Artisans.User.Name,
 		IsActive:    product.IsActive,
 		CreatedBy:   product.CreatedBy,
 		UpdatedBy:   product.UpdatedBy,
@@ -282,7 +322,7 @@ func DeleteProduct(DeleteProductRequestDTO requestsDTO.DeleteProductRequestDTO) 
 		CategoryID:  product.CategoryID,
 		CategoryName:product.Category.Name,
 		ArtisanID:   product.ArtisanID,
-		ArtisanName: product.Artisan.User.Name,
+		ArtisanName: product.Artisans.User.Name,
 		IsActive:    product.IsActive,
 		CreatedBy:   product.CreatedBy,
 		UpdatedBy:   product.UpdatedBy,

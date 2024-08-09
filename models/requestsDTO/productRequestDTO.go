@@ -20,7 +20,7 @@ type CreateProductRequestDTO struct {
 	Quantity    int     	`json:"quantity" form:"quantity" binding:"required"`
 	CategoryID  uuid.UUID   `json:"category_id" form:"category_id" binding:"required"`
 	ArtisanID   uuid.UUID   `json:"artisan_id" form:"artisan_id" binding:"required"`
-	CreatedBy   string  	`json:"created_by" form:"created_by" binding:"required"`
+	CreatedBy   string  	`json:"created_by" form:"created_by" binding:"omitempty"`
 	IsActive    bool    	`json:"is_active" form:"is_active" binding:"omitempty"`
 }
 
@@ -32,7 +32,7 @@ type UpdateProductRequestDTO struct {
 	Quantity    int       `json:"quantity" form:"quantity" binding:"omitempty"`
 	CategoryID  uuid.UUID `json:"category_id" form:"category_id" binding:"omitempty"`
 	ArtisanID   uuid.UUID `json:"artisan_id" form:"artisan_id" binding:"omitempty"`
-	UpdatedBy   string    `json:"updated_by" form:"updated_by" binding:"required"`
+	UpdatedBy   string    `json:"updated_by" form:"updated_by" binding:"omitempty"`
 	IsActive    bool      `json:"is_active" form:"is_active" binding:"omitempty"`
 }
 
