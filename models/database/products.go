@@ -6,7 +6,7 @@ import (
 	"github.com/google/uuid"
 )
 
-type Product struct {
+type Products struct {
 	ID          uuid.UUID  `gorm:"type:uuid;primary_key;default:uuid_generate_v4()"`
 	ArtisanID   uuid.UUID  `gorm:"type:uuid;not null"`
 	CategoryID  uuid.UUID  `gorm:"type:uuid;not null"`

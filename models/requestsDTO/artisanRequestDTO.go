@@ -25,7 +25,6 @@ type RegisterArtisanRequestDTO struct {
 
 type UpdateArtisanRequestDTO struct {
 	ID          string `json:"id" form:"id" binding:"required"`
-	UserID      uuid.UUID `json:"user_id" form:"user_id" binding:"required"`
 	ShopName    string `json:"shop_name" form:"shop_name" binding:"omitempty"`
 	ShopAddress string `json:"shop_address" form:"shop_address" binding:"omitempty"`
 	Description string `json:"description" form:"description" binding:"omitempty"`

@@ -20,10 +20,5 @@ type ProductResponseDTO struct {
 	CreatedAt    time.Time   `json:"created_at"`
 	UpdatedAt    time.Time   `json:"updated_at"`
 	CategoryID   uuid.UUID   `json:"category_id"`
-	CategoryName string   `json:"category_name"`
 	ArtisanID    uuid.UUID   `json:"artisan_id"`
-	ArtisanName  string   `json:"artisan_name"`
-
-	Categories CategoryResponseDTO `json:"category"`
-	Artisans  ArtisansResponseDTO `json:"artisan"`
 }

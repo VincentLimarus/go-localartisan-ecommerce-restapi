@@ -216,10 +216,8 @@ func RegisterUser(RegisterUserRequestDTO requestsDTO.RegisterUserRequestDTO) (in
 }
 
 func LoginUser(LoginUserRequestDTO requestsDTO.LoginUserRequestDTO) (int, interface{}, string) {
-	db := configs.GetDB()
 	var user database.User
-
-	err := db.Where("email = ?", LoginUserRequestDTO.Email).First(&user).Error
+	user, err := repositories.GetUserByEmail(LoginUserRequestDTO.Email)
 
 	if err != nil {
 		output := outputs.InternalServerErrorOutput{
@@ -352,7 +350,27 @@ func UpdateUser(UpdateUserRequestDTO requestsDTO.UpdateUserRequestDTO) (int, int
 func DeleteUser(DeleteUserRequestDTO requestsDTO.DeleteUserRequestDTO) (int, interface{}) {
 	db := configs.GetDB()
 	var user database.User
-	err := db.Where("id = ?", utils.StringToUUID(DeleteUserRequestDTO.ID)).First(&user).Error
+	var artisan database.Artisans
+	
+	err := db.Table("artisans").Where("user_id = ?", utils.StringToUUID(DeleteUserRequestDTO.ID)).First(&artisan).Error
+
+	if err != nil {
+		output := outputs.InternalServerErrorOutput{
+			Code: 500,
+			Message: fmt.Sprintf("Internal Server Error: %v", err),
+		}
+		return 500, output
+	}
+
+	if err := db.Delete(&artisan).Error; err != nil {
+		output := outputs.InternalServerErrorOutput{
+			Code: 500,
+			Message: fmt.Sprintf("Internal Server Error: %v", err),
+		}
+		return 500, output
+	}
+	
+	err = db.Where("id = ?", utils.StringToUUID(DeleteUserRequestDTO.ID)).First(&user).Error
 
 	if err != nil {
 		output := outputs.InternalServerErrorOutput{
@@ -377,6 +395,7 @@ func DeleteUser(DeleteUserRequestDTO requestsDTO.DeleteUserRequestDTO) (int, int
 		}
 		return 400, output
 	}
+
 
 	if err := db.Delete(&user).Error; err != nil {
 		output := outputs.InternalServerErrorOutput{

@@ -17,6 +17,6 @@ type Categories struct {
 	UpdatedAt time.Time `gorm:"autoUpdateTime;not null;default:now()"`
 
 	// Start of References
-	Product []Product `gorm:"foreignKey:CategoryID"`
+	Products []Products `gorm:"foreignKey:CategoryID"`
 	// End of References
 }

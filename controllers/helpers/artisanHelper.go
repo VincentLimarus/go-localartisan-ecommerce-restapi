@@ -45,6 +45,8 @@ func GetAllArtisans(GetAllArtisansRequestDTO requestsDTO.GetAllArtisansRequestDT
 		}
 		return 404, output
 	}
+	
+	
 	var totalData int64
 	var totalPage int 
 
@@ -68,6 +70,16 @@ func GetAllArtisans(GetAllArtisansRequestDTO requestsDTO.GetAllArtisansRequestDT
 	output.TotalPage = totalPage
 
 	for _, artisan := range artisans{
+		var productResponseDTO []responsesDTO.ProductResponseDTO
+		productResponseDTO, err = repositories.GetAllProductByArtisanID(artisan.ID.String())
+
+		if err != nil {
+			output := outputs.InternalServerErrorOutput{
+				Code:    500,
+				Message: "Internal Server Error {Error GetAllProductByArtisanID}: " + err.Error(),
+			}
+			return 500, output
+		}
 		output.Data = append(output.Data, responsesDTO.ArtisansResponseDTO{
 			ID: artisan.ID,
 			UserID: artisan.UserID,
@@ -81,13 +93,13 @@ func GetAllArtisans(GetAllArtisansRequestDTO requestsDTO.GetAllArtisansRequestDT
 			UpdatedBy: artisan.UpdatedBy,
 			CreatedAt: artisan.CreatedAt,
 			UpdatedAt: artisan.UpdatedAt,
+			Products: productResponseDTO,
 		})
 	}
 	return 200, output
 }
 
 func GetArtisan(artisanID string) (int, interface{}) {
-	// var user database.User
 	var artisan database.Artisans
 
 	artisan, err := repositories.GetArtisanByArtisanID(artisanID)
@@ -107,25 +119,13 @@ func GetArtisan(artisanID string) (int, interface{}) {
 		return 404, output
 	}
 
-	// user, err = repositories.GetUserByUserID(artisanID)
-	if err != nil {
-		output := outputs.InternalServerErrorOutput{
-			Code:    500,
-			Message: "Internal Server Error {Error GetUserByUserID}: " + err.Error(),
-		}
-		return 500, output
-	}
+	var productResponseDTO []responsesDTO.ProductResponseDTO
+	productResponseDTO, err = repositories.GetAllProductByArtisanID(artisanID)
 
-	// joinErr := db.Table("artisans").
-	// 	Joins("JOIN users ON users.id = artisans.user_id").
-	// 	Where("artisans.id = ?", utils.StringToUUID(artisanID)).
-	// 	Select("artisans.*, users.id as user_id, users.name as user_name, users.email as user_email, users.phone_number as user_phone, users.address as user_address, users.is_active as user_is_active, users.created_by as user_created_by, users.updated_by as user_updated_by, users.created_at as user_created_at, users.updated_at as user_updated_at").
-	// 	First(&artisan).Error
-	
 	if err != nil {
 		output := outputs.InternalServerErrorOutput{
 			Code:    500,
-			Message: "Internal Server Error: " + err.Error(),
+			Message: "Internal Server Error {Error GetAllProductByArtisanID}: " + err.Error(),
 		}
 		return 500, output
 	}
@@ -146,6 +146,7 @@ func GetArtisan(artisanID string) (int, interface{}) {
 		UpdatedBy:   artisan.UpdatedBy,
 		CreatedAt:   artisan.CreatedAt,
 		UpdatedAt:   artisan.UpdatedAt,
+		Products:   productResponseDTO,
 
 	}
 	return 200, output
@@ -153,8 +154,19 @@ func GetArtisan(artisanID string) (int, interface{}) {
 
 func RegisterArtisan(RegisterArtisanRequestDTO requestsDTO.RegisterArtisanRequestDTO) (int, interface{}) {
 	db := configs.GetDB()
-	
-	artisan := database.Artisans{
+	var artisan database.Artisans
+
+	err := db.Table("artisans").Where("user_id = ?", RegisterArtisanRequestDTO.UserID).First(&artisan).Error
+
+	if err == nil{
+		output := outputs.BadRequestOutput{
+			Code: 400,
+			Message: "Bad Request: User already registered as artisan (1 User can only be 1 Artisan)",
+		}
+		return 400, output
+	}
+
+	artisan = database.Artisans{
 		UserID: RegisterArtisanRequestDTO.UserID,
 		ShopName: RegisterArtisanRequestDTO.ShopName,
 		ShopAddress: RegisterArtisanRequestDTO.ShopAddress,
@@ -165,7 +177,7 @@ func RegisterArtisan(RegisterArtisanRequestDTO requestsDTO.RegisterArtisanReques
 		UpdatedBy: RegisterArtisanRequestDTO.CreatedBy,
 	}
 
-	err := db.Create(&artisan).Error
+	err = db.Create(&artisan).Error
 
 	if err != nil{
 		output := outputs.InternalServerErrorOutput{
@@ -175,14 +187,21 @@ func RegisterArtisan(RegisterArtisanRequestDTO requestsDTO.RegisterArtisanReques
 		return 500, output
 	}
 
-	if err != nil{
-		output := outputs.InternalServerErrorOutput{
-			Code: 500,
-			Message: "Internal Server Error" + err.Error(),
-		}
-		return 500, output
-	}
+	var user database.User
+	user, err = repositories.GetUserByUserID(artisan.UserID.String()) 
 
+	if user.ID == RegisterArtisanRequestDTO.UserID && err == nil{
+		user.IsArtisan = true
+		err = db.Save(&user).Error
+		if err != nil {
+			output := outputs.InternalServerErrorOutput{
+				Code:    500,
+				Message: "Internal Server Error {Error Save User}: " + err.Error(),
+			}
+			return 500, output
+		}
+	}
+	
 	output := outputs.RegisterArtisanOutput{}
 	output.Code = 200
 	output.Message = "Success: Artisan Registered"
@@ -207,21 +226,7 @@ func RegisterArtisan(RegisterArtisanRequestDTO requestsDTO.RegisterArtisanReques
 func UpdateArtisan(UpdateArtisanRequestDTO requestsDTO.UpdateArtisanRequestDTO) (int, interface{}) {
 	db := configs.GetDB()
 	var artisan database.Artisans
-	var user database.User
 
-	joinErr := db.Table("users").
-		Joins("JOIN artisans ON users.id = artisans.user_id").
-		Where("users.id = ?", UpdateArtisanRequestDTO.UserID).
-		First(&user).Error
-
-	if joinErr != nil{
-		output := outputs.InternalServerErrorOutput{
-			Code: 500,
-			Message: "Internal Server Error {Error Join Query}" + joinErr.Error(),
-		}
-		return 500, output
-	}
-	
 	err := db.Where("id = ?", utils.StringToUUID(UpdateArtisanRequestDTO.ID)).First(&artisan).Error
 	
 	if err != nil{
@@ -237,14 +242,11 @@ func UpdateArtisan(UpdateArtisanRequestDTO requestsDTO.UpdateArtisanRequestDTO) 
 			Code: 404,
 			Message: "Not Found: Artisan not exist",
 		}
-		return 404, output
+		return 404, output	
 	}
 
 	artisan.IsActive = UpdateArtisanRequestDTO.IsActive
-	
-	if UpdateArtisanRequestDTO.UserID != uuid.Nil{
-		artisan.UserID = UpdateArtisanRequestDTO.UserID
-	}
+
 	if UpdateArtisanRequestDTO.ShopName != ""{
 		artisan.ShopName = UpdateArtisanRequestDTO.ShopName
 	}
@@ -272,6 +274,17 @@ func UpdateArtisan(UpdateArtisanRequestDTO requestsDTO.UpdateArtisanRequestDTO) 
 		return 500, output
 	}
 
+	var productResponseDTO []responsesDTO.ProductResponseDTO
+	productResponseDTO, err = repositories.GetAllProductByArtisanID(UpdateArtisanRequestDTO.ID)
+
+	if err != nil {
+		output := outputs.InternalServerErrorOutput{
+			Code:    500,
+			Message: "Internal Server Error {Error GetAllProductByArtisanID}: " + err.Error(),
+		}
+		return 500, output
+	}
+	
 	output := outputs.UpdateArtisanOutput{}
 	output.Code = 200
 	output.Message = "Success: Artisan Updated"
@@ -288,7 +301,7 @@ func UpdateArtisan(UpdateArtisanRequestDTO requestsDTO.UpdateArtisanRequestDTO) 
 		UpdatedBy: artisan.UpdatedBy,
 		CreatedAt: artisan.CreatedAt,
 		UpdatedAt: artisan.UpdatedAt,
-
+		Products: productResponseDTO,
 	}
 	return 200, output
 }
@@ -296,22 +309,29 @@ func UpdateArtisan(UpdateArtisanRequestDTO requestsDTO.UpdateArtisanRequestDTO) 
 func DeleteArtisan(DeleteArtisanRequestDTO requestsDTO.DeleteArtisanRequestDTO) (int, interface{}) {
 	db := configs.GetDB()
 	var artisan database.Artisans
-	var user database.User
+	var products []database.Products
 
-	joinErr := db.Table("users").
-		Joins("JOIN artisans ON users.id = artisans.user_id").
-		Where("users.id = ?", DeleteArtisanRequestDTO.UserID).
-		First(&user).Error
+	err := db.Where("artisan_id = ?", utils.StringToUUID(DeleteArtisanRequestDTO.ID)).Find(&products).Error
 
-	if joinErr != nil{
+	if err != nil{
 		output := outputs.InternalServerErrorOutput{
 			Code: 500,
-			Message: "Internal Server Error {Error Join Query} " + joinErr.Error(),
+			Message: "Internal Server Error" + err.Error(),
 		}
 		return 500, output
-	}	
+	}
 
-	err := db.Where("id = ?", utils.StringToUUID(DeleteArtisanRequestDTO.ID)).First(&artisan).Error
+	for _, product := range products{
+		if err := db.Delete(&product).Error; err != nil {
+			output := outputs.InternalServerErrorOutput{
+				Code: 500,
+				Message: fmt.Sprintf("Internal Server Error: %v", err),
+			}
+			return 500, output
+		}
+	}
+
+	err = db.Where("id = ?", utils.StringToUUID(DeleteArtisanRequestDTO.ID)).First(&artisan).Error
 
 	if err != nil{
 		output := outputs.InternalServerErrorOutput{
@@ -329,6 +349,21 @@ func DeleteArtisan(DeleteArtisanRequestDTO requestsDTO.DeleteArtisanRequestDTO) 
 		return 404, output
 	}
 
+	var user database.User
+	user, err = repositories.GetUserByUserID(DeleteArtisanRequestDTO.UserID.String())
+
+	if user.ID == DeleteArtisanRequestDTO.UserID && err == nil{
+		user.IsArtisan = false
+		err = db.Save(&user).Error
+		if err != nil {
+			output := outputs.InternalServerErrorOutput{
+				Code:    500,
+				Message: "Internal Server Error {Error Save User}: " + err.Error(),
+			}
+			return 500, output
+		}
+	}
+
 	err = db.Delete(&artisan).Error
 	if err != nil{
 		output := outputs.InternalServerErrorOutput{
@@ -338,6 +373,16 @@ func DeleteArtisan(DeleteArtisanRequestDTO requestsDTO.DeleteArtisanRequestDTO) 
 		return 500, output
 	}
 
+	var productResponseDTO []responsesDTO.ProductResponseDTO
+	productResponseDTO, err = repositories.GetAllProductByArtisanID(DeleteArtisanRequestDTO.ID)
+
+	if err != nil {
+		output := outputs.InternalServerErrorOutput{
+			Code:    500,
+			Message: "Internal Server Error {Error GetAllProductByArtisanID}: " + err.Error(),
+		}
+		return 500, output
+	}
 	output := outputs.DeleteArtisanOutput{}
 	output.Code = 200
 	output.Message = "Success: Artisan Deleted"
@@ -354,8 +399,7 @@ func DeleteArtisan(DeleteArtisanRequestDTO requestsDTO.DeleteArtisanRequestDTO) 
 		UpdatedBy: artisan.UpdatedBy,
 		CreatedAt: artisan.CreatedAt,
 		UpdatedAt: artisan.UpdatedAt,
-
+		Products: productResponseDTO,
 	}
-	
 	return 200, output
 }

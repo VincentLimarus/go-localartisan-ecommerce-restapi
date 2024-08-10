@@ -5,8 +5,10 @@ import (
 	"localArtisans/configs"
 	"localArtisans/models/database"
 	"localArtisans/models/outputs"
+	"localArtisans/models/repositories"
 	"localArtisans/models/requestsDTO"
 	"localArtisans/models/responsesDTO"
+	"localArtisans/utils"
 )
 
 func GetAllCategories(GetAllCategoriesRequestDTO requestsDTO.GetAllCategoriesRequestDTO) (int, interface{}) {
@@ -62,6 +64,16 @@ func GetAllCategories(GetAllCategoriesRequestDTO requestsDTO.GetAllCategoriesReq
 	output.TotalPage = totalPage
 
 	for _, category := range categories {
+		var productResponseDTO []responsesDTO.ProductResponseDTO
+		productResponseDTO, err = repositories.GetAllProductByCategoryID(category.ID.String())
+
+		if err != nil {
+			output := outputs.InternalServerErrorOutput{
+				Code:    500,
+				Message: "Internal Server Error {Error GetAllProductByArtisanID}: " + err.Error(),
+			}
+			return 500, output
+		}
 		output.Data = append(output.Data, responsesDTO.CategoryResponseDTO{
 			ID:        category.ID,
 			Name:      category.Name,
@@ -71,16 +83,16 @@ func GetAllCategories(GetAllCategoriesRequestDTO requestsDTO.GetAllCategoriesReq
 			UpdatedBy: category.UpdatedBy,
 			CreatedAt: category.CreatedAt,
 			UpdatedAt: category.UpdatedAt,
+			Products: productResponseDTO,
 		})
 	}
 	return 200, output
 }
 
-func GetCategory(CategoryID string) (int, interface{}){
-	db := configs.GetDB()
-	category := database.Categories{}
-	
-	err := db.Table("categories").Where("id = ?", CategoryID).First(&category).Error
+func GetCategory(categoryID string) (int, interface{}){
+	var category database.Categories
+
+	category, err := repositories.GetCategoryByCategoryID(categoryID)
 
 	if err != nil {
 		output := outputs.NotFoundOutput{
@@ -90,6 +102,17 @@ func GetCategory(CategoryID string) (int, interface{}){
 		return 404, output
 	}
 
+	var productResponseDTO []responsesDTO.ProductResponseDTO
+	productResponseDTO, err = repositories.GetAllProductByCategoryID(categoryID)
+
+	if err != nil {
+		output := outputs.InternalServerErrorOutput{
+			Code:    500,
+			Message: "Internal Server Error {Error GetAllProductByArtisanID}: " + err.Error(),
+		}
+		return 500, output
+	}
+	
 	output := outputs.GetCategoryOutput{}
 	output.Code = 200
 	output.Message = "Success: Category Found"
@@ -102,6 +125,7 @@ func GetCategory(CategoryID string) (int, interface{}){
 		UpdatedBy: category.UpdatedBy,
 		CreatedAt: category.CreatedAt,
 		UpdatedAt: category.UpdatedAt,
+		Products: productResponseDTO,
 	}
 	return 200, output
 }
@@ -176,6 +200,17 @@ func UpdateCategory(UpdateCategoryRequestDTO requestsDTO.UpdateCategoryRequestDT
 		return 500, output
 	}
 
+	var productResponseDTO []responsesDTO.ProductResponseDTO
+	productResponseDTO, err = repositories.GetAllProductByCategoryID(UpdateCategoryRequestDTO.ID)
+
+	if err != nil {
+		output := outputs.InternalServerErrorOutput{
+			Code:    500,
+			Message: "Internal Server Error {Error GetAllProductByArtisanID}: " + err.Error(),
+		}
+		return 500, output
+	}
+
 	output := outputs.UpdateCategoryOutput{}
 	output.Code = 200
 	output.Message = "Success: Category Updated"
@@ -188,15 +223,38 @@ func UpdateCategory(UpdateCategoryRequestDTO requestsDTO.UpdateCategoryRequestDT
 		UpdatedBy: category.UpdatedBy,
 		CreatedAt: category.CreatedAt,
 		UpdatedAt: category.UpdatedAt,
+		Products: productResponseDTO,
 	}
 	return 200, output
 }
 
 func DeleteCategory(DeleteCategoryRequestDTO requestsDTO.DeleteCategoryRequestDTO) (int, interface{}) {
 	db := configs.GetDB()
-	category := database.Categories{}
+	var category database.Categories
+	var products []database.Products
 	
-	err := db.Table("categories").Where("id = ?", DeleteCategoryRequestDTO.ID).First(&category).Error
+	err := db.Where("category_id = ?", utils.StringToUUID(DeleteCategoryRequestDTO.ID)).Find(&products).Error
+
+	if err != nil{
+		output := outputs.InternalServerErrorOutput{
+			Code: 500,
+			Message: "Internal Server Error" + err.Error(),
+		}
+		return 500, output
+	}
+
+	for _, product := range products{
+		if err := db.Delete(&product).Error; err != nil {
+			output := outputs.InternalServerErrorOutput{
+				Code: 500,
+				Message: fmt.Sprintf("Internal Server Error: %v", err),
+			}
+			return 500, output
+		}
+	}
+
+
+	err = db.Table("categories").Where("id = ?", DeleteCategoryRequestDTO.ID).First(&category).Error
 	if err != nil {
 		output := outputs.NotFoundOutput{
 			Code: 404,
@@ -214,6 +272,17 @@ func DeleteCategory(DeleteCategoryRequestDTO requestsDTO.DeleteCategoryRequestDT
 		return 500, output
 	}
 
+	var productResponseDTO []responsesDTO.ProductResponseDTO
+	productResponseDTO, err = repositories.GetAllProductByCategoryID(DeleteCategoryRequestDTO.ID)
+
+	if err != nil {
+		output := outputs.InternalServerErrorOutput{
+			Code:    500,
+			Message: "Internal Server Error {Error GetAllProductByArtisanID}: " + err.Error(),
+		}
+		return 500, output
+	}
+
 	output := outputs.DeleteCategoryOutput{}
 	output.Code = 200
 	output.Message = "Success: Category Deleted"
@@ -226,6 +295,7 @@ func DeleteCategory(DeleteCategoryRequestDTO requestsDTO.DeleteCategoryRequestDT
 		UpdatedBy: category.UpdatedBy,
 		CreatedAt: category.CreatedAt,
 		UpdatedAt: category.UpdatedAt,
+		Products: productResponseDTO,
 	}
 	return 200, output
 }

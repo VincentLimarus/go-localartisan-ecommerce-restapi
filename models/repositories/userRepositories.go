@@ -10,21 +10,22 @@ func GetUserByUserID(UserID string) (database.User, error) {
 
 	db := configs.GetDB()
 	err := db.Table("users").Where("id = ?", UserID).First(&user).Error
-
+	
 	if err != nil {
 		return user, err
 	}
 	return user, nil
 }
 
-func GetArtisanByUserID(UserID string) (database.Artisans, error) {
-	var artisan database.Artisans
+
+func GetUserByEmail(Email string) (database.User, error) {
+	var user database.User
 
 	db := configs.GetDB()
-	err := db.Table("artisans").Where("user_id = ?", UserID).First(&artisan).Error
+	err := db.Table("users").Where("email = ?", Email).First(&user).Error
 
 	if err != nil {
-		return artisan, err
+		return user, err
 	}
-	return artisan, nil
+	return user, nil
 }

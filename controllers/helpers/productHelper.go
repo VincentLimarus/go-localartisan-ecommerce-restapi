@@ -5,13 +5,14 @@ import (
 	"localArtisans/configs"
 	"localArtisans/models/database"
 	"localArtisans/models/outputs"
+	"localArtisans/models/repositories"
 	"localArtisans/models/requestsDTO"
 	"localArtisans/models/responsesDTO"
 )
 
 func GetAllProduct(GetAllProductRequestDTO requestsDTO.GetAllProductRequestDTO) (int, interface{}) {
 	db := configs.GetDB()
-	var products []database.Product
+	var products []database.Products
 	
 	if GetAllProductRequestDTO.Limit > 100 {
 		output := outputs.BadRequestOutput{
@@ -43,7 +44,7 @@ func GetAllProduct(GetAllProductRequestDTO requestsDTO.GetAllProductRequestDTO) 
 
 	var totalData int64
 	var totalPage int
-	db.Model(&database.Product{}).Count(&totalData)
+	db.Model(&database.Products{}).Count(&totalData)
 	if totalData%int64(GetAllProductRequestDTO.Limit) == 0 {
 		totalPage = int(totalData / int64(GetAllProductRequestDTO.Limit))
 	} else {
@@ -63,6 +64,8 @@ func GetAllProduct(GetAllProductRequestDTO requestsDTO.GetAllProductRequestDTO) 
 	for _, product := range products {
 		output.Data = append(output.Data, responsesDTO.ProductResponseDTO{
 			ID:          product.ID,
+			ArtisanID:  product.ArtisanID,
+			CategoryID: product.CategoryID,
 			Name:        product.Name,
 			Price:       product.Price,
 			Description: product.Description,
@@ -80,15 +83,9 @@ func GetAllProduct(GetAllProductRequestDTO requestsDTO.GetAllProductRequestDTO) 
 }
 
 func GetProduct(productID string) (int, interface{}) {
-	db := configs.GetDB()
-	var product database.Product
+	var product database.Products
 
-	err := db.Table("products").
-		Joins("JOIN artisans a ON a.id = products.artisan_id").
-		Joins("JOIN categories c ON c.id = products.category_id").
-		Where("products.id = ?", productID).
-		Select("products.*, a.*, c.*").
-		First(&product).Error
+	product, err := repositories.GetProductByProductID(productID)
 
 	if err != nil {
 		output := outputs.NotFoundOutput{
@@ -103,6 +100,8 @@ func GetProduct(productID string) (int, interface{}) {
 	output.Message = "Success: Product Found"
 	output.Data = responsesDTO.ProductResponseDTO{
 		ID:          product.ID,
+		ArtisanID:  product.ArtisanID,
+		CategoryID: product.CategoryID,
 		Name:        product.Name,
 		Price:       product.Price,
 		Description: product.Description,
@@ -120,7 +119,9 @@ func GetProduct(productID string) (int, interface{}) {
 
 func CreateProduct(CreateProductRequestDTO requestsDTO.CreateProductRequestDTO) (int, interface{}){
 	db := configs.GetDB()
-	product := database.Product{
+	product := database.Products{
+		CategoryID:  CreateProductRequestDTO.CategoryID,
+		ArtisanID:   CreateProductRequestDTO.ArtisanID,
 		Name:        CreateProductRequestDTO.Name,
 		Price:       CreateProductRequestDTO.Price,
 		Description: CreateProductRequestDTO.Description,
@@ -144,6 +145,8 @@ func CreateProduct(CreateProductRequestDTO requestsDTO.CreateProductRequestDTO) 
 	output.Message = "Success: Product Created"
 	output.Data = responsesDTO.ProductResponseDTO{
 		ID:          product.ID,
+		ArtisanID:  product.ArtisanID,
+		CategoryID:  product.CategoryID,
 		Name:        product.Name,
 		Price:       product.Price,
 		Description: product.Description,
@@ -161,7 +164,7 @@ func CreateProduct(CreateProductRequestDTO requestsDTO.CreateProductRequestDTO) 
 
 func UpdateProduct(UpdateProductRequestDTO requestsDTO.UpdateProductRequestDTO) (int, interface{}) {
 	db := configs.GetDB()
-	product := database.Product{}
+	product := database.Products{}
 
 	err := db.Table("products").Where("id = ?", UpdateProductRequestDTO.ID).First(&product).Error
 
@@ -208,6 +211,8 @@ func UpdateProduct(UpdateProductRequestDTO requestsDTO.UpdateProductRequestDTO) 
 	output.Message = "Success: Product Updated"
 	output.Data = responsesDTO.ProductResponseDTO{
 		ID:          product.ID,
+		ArtisanID:  product.ArtisanID,
+		CategoryID: product.CategoryID,		
 		Name:        product.Name,
 		Price:       product.Price,
 		Description: product.Description,
@@ -225,7 +230,7 @@ func UpdateProduct(UpdateProductRequestDTO requestsDTO.UpdateProductRequestDTO) 
 
 func DeleteProduct(DeleteProductRequestDTO requestsDTO.DeleteProductRequestDTO) (int, interface{}) {
 	db := configs.GetDB()
-	product := database.Product{}
+	product := database.Products{}
 
 	err := db.Table("products").Where("id = ?", DeleteProductRequestDTO.ID).First(&product).Error
 
@@ -252,6 +257,8 @@ func DeleteProduct(DeleteProductRequestDTO requestsDTO.DeleteProductRequestDTO) 
 	output.Message = "Success: Product Deleted"
 	output.Data = responsesDTO.ProductResponseDTO{
 		ID:          product.ID,
+		ArtisanID:  product.ArtisanID,
+		CategoryID: product.CategoryID,		
 		Name:        product.Name,
 		Price:       product.Price,
 		Description: product.Description,

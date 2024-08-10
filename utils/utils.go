@@ -10,6 +10,10 @@ func StringToUUID(s string) uuid.UUID {
 	return id
 }
 
+func UUIDToString(id uuid.UUID) string {
+	return id.String()
+}
+
 func HashPassword(password string) (string, error) {
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	return string(hash), err
