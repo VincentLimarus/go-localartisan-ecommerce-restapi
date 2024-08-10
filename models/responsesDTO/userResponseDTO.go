@@ -12,6 +12,7 @@ type UserResponseDTO struct {
 	Email       string    `json:"email"`
 	PhoneNumber string    `json:"phone_number"`
 	Address     string    `json:"address"`
+	IsArtisan   bool      `json:"is_artisan"`
 	IsActive    bool      `json:"is_active"`
 	CreatedBy   string    `json:"created_by"`
 	UpdatedBy   string    `json:"updated_by"`

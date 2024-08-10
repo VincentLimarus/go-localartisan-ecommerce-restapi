@@ -151,19 +151,9 @@ func GetArtisan(artisanID string) (int, interface{}) {
 	return 200, output
 }
 
-func RegisterArtisan(RegisterArtisanRequestDTO requestsDTO.RegisterArtisanRequestDTO, UserInformation requestsDTO.UserInformation) (int, interface{}) {
+func RegisterArtisan(RegisterArtisanRequestDTO requestsDTO.RegisterArtisanRequestDTO) (int, interface{}) {
 	db := configs.GetDB()
 	
-	joinErr := db.Table("users").Where("id = ?", RegisterArtisanRequestDTO.UserID).First(&UserInformation).Joins("artisans", "users.id = artisans.user_id").Error
-
-	if joinErr != nil{
-		output := outputs.InternalServerErrorOutput{
-			Code: 500,
-			Message: "Internal Server Error {Error Join Query}" + joinErr.Error(),
-		}
-		return 500, output
-	}
-
 	artisan := database.Artisans{
 		UserID: RegisterArtisanRequestDTO.UserID,
 		ShopName: RegisterArtisanRequestDTO.ShopName,
@@ -175,8 +165,15 @@ func RegisterArtisan(RegisterArtisanRequestDTO requestsDTO.RegisterArtisanReques
 		UpdatedBy: RegisterArtisanRequestDTO.CreatedBy,
 	}
 
-
 	err := db.Create(&artisan).Error
+
+	if err != nil{
+		output := outputs.InternalServerErrorOutput{
+			Code: 500,
+			Message: "Internal Server Error" + err.Error(),
+		}
+		return 500, output
+	}
 
 	if err != nil{
 		output := outputs.InternalServerErrorOutput{

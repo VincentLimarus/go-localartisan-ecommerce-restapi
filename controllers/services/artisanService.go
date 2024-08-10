@@ -46,7 +46,6 @@ func GetArtisan(c *gin.Context) {
 
 func RegisterArtisan(c *gin.Context){
 	var RegisterArtisanRequestDTO requestsDTO.RegisterArtisanRequestDTO
-	var UserInformation requestsDTO.UserInformation
 
 	if err := c.ShouldBindJSON(&RegisterArtisanRequestDTO); err != nil {
 		output := outputs.BadRequestOutput{
@@ -56,7 +55,7 @@ func RegisterArtisan(c *gin.Context){
 		c.JSON(http.StatusBadRequest, output)
 		return
 	}
-	code, output := helpers.RegisterArtisan(RegisterArtisanRequestDTO, UserInformation)
+	code, output := helpers.RegisterArtisan(RegisterArtisanRequestDTO)
 	c.JSON(code, output)
 }
 

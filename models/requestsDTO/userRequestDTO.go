@@ -1,11 +1,5 @@
 package requestsDTO
 
-import (
-	"time"
-
-	"github.com/google/uuid"
-)
-
 type GetAllUsersRequestDTO struct {
 	Page      int    `json:"page" form:"page" binding:"omitempty"`
 	Limit     int    `json:"limit" form:"limit" binding:"omitempty"`
@@ -53,17 +47,4 @@ type ChangePasswordRequestDTO struct {
 	NewPassword     string `json:"new_password" form:"new_password" binding:"required"`
 	ConfirmPassword string `json:"confirm_password" form:"confirm_password" binding:"required"`
 	UpdatedBy       string `json:"updated_by" form:"updated_by" binding:"omitempty"`
-}
-
-type UserInformation struct {
-	ID          uuid.UUID    `json:"id" form:"id" binding:"required"`
-	Name        string    `json:"name" form:"name" binding:"omitempty"`
-	Email       string    `json:"email" form:"email" binding:"omitempty"`
-	PhoneNumber string    `json:"phone_number" form:"phone_number" binding:"omitempty"`
-	Address     string    `json:"address" form:"address" binding:"omitempty"`
-	IsActive    bool      `json:"is_active" form:"is_active" binding:"omitempty"`
-	CreatedBy   string    `json:"created_by" form:"created_by" binding:"omitempty"`
-	UpdatedBy   string    `json:"updated_by" form:"updated_by" binding:"omitempty"`
-	CreatedAt   time.Time `json:"created_at" form:"created_at" binding:"omitempty"`
-	UpdatedAt   time.Time `json:"updated_at" form:"updated_at" binding:"omitempty"`
 }

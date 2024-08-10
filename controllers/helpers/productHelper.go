@@ -7,8 +7,6 @@ import (
 	"localArtisans/models/outputs"
 	"localArtisans/models/requestsDTO"
 	"localArtisans/models/responsesDTO"
-
-	"github.com/google/uuid"
 )
 
 func GetAllProduct(GetAllProductRequestDTO requestsDTO.GetAllProductRequestDTO) (int, interface{}) {
@@ -71,8 +69,6 @@ func GetAllProduct(GetAllProductRequestDTO requestsDTO.GetAllProductRequestDTO) 
 			Quantity:    product.Quantity,
 			ItemSold:    product.ItemSold,
 			Rating:      product.Rating,
-			CategoryID:  product.CategoryID,
-			ArtisanID:   product.ArtisanID,
 			IsActive:    product.IsActive,
 			CreatedBy:   product.CreatedBy,
 			UpdatedBy:   product.UpdatedBy,
@@ -113,8 +109,6 @@ func GetProduct(productID string) (int, interface{}) {
 		Quantity:    product.Quantity,
 		ItemSold:    product.ItemSold,
 		Rating:      product.Rating,
-		CategoryID:  product.CategoryID,
-		ArtisanID:   product.ArtisanID,
 		IsActive:    product.IsActive,
 		CreatedBy:   product.CreatedBy,
 		UpdatedBy:   product.UpdatedBy,
@@ -131,8 +125,6 @@ func CreateProduct(CreateProductRequestDTO requestsDTO.CreateProductRequestDTO) 
 		Price:       CreateProductRequestDTO.Price,
 		Description: CreateProductRequestDTO.Description,
 		Quantity:    CreateProductRequestDTO.Quantity,
-		CategoryID:  CreateProductRequestDTO.CategoryID,
-		ArtisanID:   CreateProductRequestDTO.ArtisanID,
 		CreatedBy:   CreateProductRequestDTO.CreatedBy,
 		IsActive:    CreateProductRequestDTO.IsActive,
 	}
@@ -158,9 +150,6 @@ func CreateProduct(CreateProductRequestDTO requestsDTO.CreateProductRequestDTO) 
 		Quantity:    product.Quantity,
 		ItemSold:    product.ItemSold,
 		Rating:      product.Rating,
-		CategoryID:  product.CategoryID,
-		CategoryName:product.Category.Name,
-		ArtisanID:   product.ArtisanID,
 		IsActive:    product.IsActive,
 		CreatedBy:   product.CreatedBy,
 		UpdatedBy:   product.UpdatedBy,
@@ -196,12 +185,6 @@ func UpdateProduct(UpdateProductRequestDTO requestsDTO.UpdateProductRequestDTO) 
 	if UpdateProductRequestDTO.Quantity != 0 {
 		product.Quantity = UpdateProductRequestDTO.Quantity
 	}
-	if UpdateProductRequestDTO.CategoryID != uuid.Nil {
-		product.CategoryID = UpdateProductRequestDTO.CategoryID
-	}
-	if UpdateProductRequestDTO.ArtisanID != uuid.Nil {
-		product.ArtisanID = UpdateProductRequestDTO.ArtisanID
-	}
 	if UpdateProductRequestDTO.UpdatedBy == "" {
 		product.UpdatedBy = "user"
 	} else{
@@ -231,9 +214,6 @@ func UpdateProduct(UpdateProductRequestDTO requestsDTO.UpdateProductRequestDTO) 
 		Quantity:    product.Quantity,
 		ItemSold:    product.ItemSold,
 		Rating:      product.Rating,
-		CategoryID:  product.CategoryID,
-		CategoryName:product.Category.Name,
-		ArtisanID:   product.ArtisanID,
 		IsActive:    product.IsActive,
 		CreatedBy:   product.CreatedBy,
 		UpdatedBy:   product.UpdatedBy,
@@ -278,9 +258,6 @@ func DeleteProduct(DeleteProductRequestDTO requestsDTO.DeleteProductRequestDTO) 
 		Quantity:    product.Quantity,
 		ItemSold:    product.ItemSold,
 		Rating:      product.Rating,
-		CategoryID:  product.CategoryID,
-		CategoryName:product.Category.Name,
-		ArtisanID:   product.ArtisanID,
 		IsActive:    product.IsActive,
 		CreatedBy:   product.CreatedBy,
 		UpdatedBy:   product.UpdatedBy,

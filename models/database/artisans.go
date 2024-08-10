@@ -20,7 +20,7 @@ type Artisans struct {
 	CreatedAt   time.Time 	`gorm:"autoCreateTime;not null;default:now()"`
 	UpdatedAt   time.Time 	`gorm:"autoUpdateTime;not null;default:now()"`
 
-	// Start of FK
-	Products 	[]Product 	`gorm:"foreignKey:ArtisanID"`
-	// End of FK
+	// Start of References
+	Product 	[]Product 	`gorm:"foreignKey:ArtisanID"`
+	// End of References
 }	

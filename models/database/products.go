@@ -8,6 +8,8 @@ import (
 
 type Product struct {
 	ID          uuid.UUID  `gorm:"type:uuid;primary_key;default:uuid_generate_v4()"`
+	ArtisanID   uuid.UUID  `gorm:"type:uuid;not null"`
+	CategoryID  uuid.UUID  `gorm:"type:uuid;not null"`
 	Name        string     `gorm:"type:varchar(255);not null"`
 	Price       float64    `gorm:"type:decimal(10,2);not null"`
 	Description string     `gorm:"type:text;not null"`
@@ -20,11 +22,10 @@ type Product struct {
 	CreatedAt   time.Time  `gorm:"type:timestamp;not null;default:now()"`
 	UpdatedAt   time.Time  `gorm:"type:timestamp;not null;default:now()"`
 
-	// Start of FK
-	CategoryID  uuid.UUID  `gorm:"type:uuid;not null"`
-	Category    Categories   `gorm:"foreignKey:CategoryID"`
-
-	ArtisanID   uuid.UUID  `gorm:"type:uuid;not null"`
-	Artisans     Artisans    `gorm:"foreignKey:ArtisanID"`
-	// End of FK
+	// Start of References
+	// Promos   []Promo    `gorm:"foreignKey:ProductID"`
+	// Reviews  []Reviews  `gorm:"foreignKey:ProductID"`
+	// CartInformations []CartInformation `gorm:"foreignKey:ProductID"`
+	// OrdersItems []OrdersItems `gorm:"foreignKey:ProductID"`
+	// End of References
 }
