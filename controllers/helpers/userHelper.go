@@ -77,7 +77,6 @@ func GetAllUser(GetAllUsersRequestDTO requestsDTO.GetAllUsersRequestDTO) (int, i
 	output.TotalPage = totalPage
 	
 	for _, user := range users {
-	
 		userResponse := responsesDTO.UserResponseDTO{
 			ID: user.ID,
 			Name: user.Name,

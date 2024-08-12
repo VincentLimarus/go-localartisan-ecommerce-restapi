@@ -70,7 +70,7 @@ func GetAllCategories(GetAllCategoriesRequestDTO requestsDTO.GetAllCategoriesReq
 		if err != nil {
 			output := outputs.InternalServerErrorOutput{
 				Code:    500,
-				Message: "Internal Server Error {Error GetAllProductByArtisanID}: " + err.Error(),
+				Message: "Internal Server Error {Error GetAllProductByCategoryID}: " + err.Error(),
 			}
 			return 500, output
 		}
@@ -108,7 +108,7 @@ func GetCategory(categoryID string) (int, interface{}){
 	if err != nil {
 		output := outputs.InternalServerErrorOutput{
 			Code:    500,
-			Message: "Internal Server Error {Error GetAllProductByArtisanID}: " + err.Error(),
+			Message: "Internal Server Error {Error GetAllProductByCategoryID}: " + err.Error(),
 		}
 		return 500, output
 	}
@@ -206,7 +206,7 @@ func UpdateCategory(UpdateCategoryRequestDTO requestsDTO.UpdateCategoryRequestDT
 	if err != nil {
 		output := outputs.InternalServerErrorOutput{
 			Code:    500,
-			Message: "Internal Server Error {Error GetAllProductByArtisanID}: " + err.Error(),
+			Message: "Internal Server Error {Error GetAllProductByCategoryID}: " + err.Error(),
 		}
 		return 500, output
 	}
@@ -278,7 +278,7 @@ func DeleteCategory(DeleteCategoryRequestDTO requestsDTO.DeleteCategoryRequestDT
 	if err != nil {
 		output := outputs.InternalServerErrorOutput{
 			Code:    500,
-			Message: "Internal Server Error {Error GetAllProductByArtisanID}: " + err.Error(),
+			Message: "Internal Server Error {Error GetAllProductByCategoryID}: " + err.Error(),
 		}
 		return 500, output
 	}
