@@ -176,7 +176,8 @@ func UpdateCategory(UpdateCategoryRequestDTO requestsDTO.UpdateCategoryRequestDT
 		}
 		return 404, output
 	}
-
+	
+	// Not NULL Update constraint -> ini tidak boleh null, kalo user tidak mengisi maka akan diisi oleh sistem
 	if UpdateCategoryRequestDTO.Name != "" {
 		category.Name = UpdateCategoryRequestDTO.Name
 	}

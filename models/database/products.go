@@ -7,7 +7,7 @@ import (
 )
 
 type Products struct {
-	ID          uuid.UUID  `gorm:"type:uuid;primary_key;default:uuid_generate_v4()"`
+	ID          uuid.UUID  `gorm:"type:uuid;primary_key;not null;default:uuid_generate_v4()"`
 	ArtisanID   uuid.UUID  `gorm:"type:uuid;not null"`
 	CategoryID  uuid.UUID  `gorm:"type:uuid;not null"`
 	Name        string     `gorm:"type:varchar(255);not null"`
@@ -23,7 +23,7 @@ type Products struct {
 	UpdatedAt   time.Time  `gorm:"type:timestamp;not null;default:now()"`
 
 	// Start of References
-	// Promos   []Promo    `gorm:"foreignKey:ProductID"`
+	Promos   []Promos    `gorm:"foreignKey:ProductID"`
 	// Reviews  []Reviews  `gorm:"foreignKey:ProductID"`
 	// CartInformations []CartInformation `gorm:"foreignKey:ProductID"`
 	// OrdersItems []OrdersItems `gorm:"foreignKey:ProductID"`

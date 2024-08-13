@@ -20,5 +20,5 @@ type ProductResponseDTO struct {
 	CreatedAt    time.Time   `json:"created_at"`
 	UpdatedAt    time.Time   `json:"updated_at"`
 	CategoryID   uuid.UUID   `json:"category_id"`
-	ArtisanID    uuid.UUID   `json:"artisan_id"`
+	ArtisanID    uuid.UUID   `json:"artisan_id"` 
 }

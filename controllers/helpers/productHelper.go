@@ -82,9 +82,46 @@ func GetAllProduct(GetAllProductRequestDTO requestsDTO.GetAllProductRequestDTO) 
 	return 200, output	
 }
 
+func GetAllProductByArtisanID(artisanID string) (int, interface{}) {
+	var products []responsesDTO.ProductResponseDTO
+	products, err := repositories.GetAllProductByArtisanID(artisanID)
+
+	if err != nil {
+		output := outputs.NotFoundOutput{
+			Code: 404,
+			Message: "Not Found: Products not exist",
+		}
+		return 404, output
+	}
+
+	output := outputs.GetAllProductByArtisanIDOutput{}
+	output.Code = 200
+	output.Message = "Success: Products Found"
+	output.Data = products
+	return 200, output
+}
+
+func GetAllProductByCategoryID(categoryID string) (int, interface{}) {
+	var products []responsesDTO.ProductResponseDTO
+	products, err := repositories.GetAllProductByCategoryID(categoryID)
+
+	if err != nil {
+		output := outputs.NotFoundOutput{
+			Code: 404,
+			Message: "Not Found: Products not exist",
+		}
+		return 404, output
+	}
+
+	output := outputs.GetAllProductByCategoryIDOutput{}
+	output.Code = 200
+	output.Message = "Success: Products Found"
+	output.Data = products
+	return 200, output
+}	
+
 func GetProduct(productID string) (int, interface{}) {
 	var product database.Products
-
 	product, err := repositories.GetProductByProductID(productID)
 
 	if err != nil {
@@ -176,8 +213,14 @@ func UpdateProduct(UpdateProductRequestDTO requestsDTO.UpdateProductRequestDTO) 
 		return 404, output
 	}
 
+	// Not NULL Update constraint -> ini tidak boleh null, kalo user tidak mengisi maka akan diisi oleh sistem
 	if UpdateProductRequestDTO.Name != "" {
 		product.Name = UpdateProductRequestDTO.Name
+	}
+	if UpdateProductRequestDTO.UpdatedBy == "" {
+		product.UpdatedBy = "user"
+	} else{
+		product.UpdatedBy = UpdateProductRequestDTO.UpdatedBy
 	}
 	if UpdateProductRequestDTO.Price != 0 {
 		product.Price = UpdateProductRequestDTO.Price
@@ -188,13 +231,11 @@ func UpdateProduct(UpdateProductRequestDTO requestsDTO.UpdateProductRequestDTO) 
 	if UpdateProductRequestDTO.Quantity != 0 {
 		product.Quantity = UpdateProductRequestDTO.Quantity
 	}
-	if UpdateProductRequestDTO.UpdatedBy == "" {
-		product.UpdatedBy = "user"
-	} else{
-		product.UpdatedBy = UpdateProductRequestDTO.UpdatedBy
-	}
 
+	// Boolean Update Constraint
 	product.IsActive = UpdateProductRequestDTO.IsActive
+
+	
 
 	err = db.Save(&product).Error
 

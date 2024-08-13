@@ -245,25 +245,22 @@ func UpdateArtisan(UpdateArtisanRequestDTO requestsDTO.UpdateArtisanRequestDTO) 
 		return 404, output	
 	}
 
-	artisan.IsActive = UpdateArtisanRequestDTO.IsActive
-
+	// Not NULL Update constraint -> ini tidak boleh null, kalo user tidak mengisi maka akan diisi oleh sistem
 	if UpdateArtisanRequestDTO.ShopName != ""{
 		artisan.ShopName = UpdateArtisanRequestDTO.ShopName
 	}
 	if UpdateArtisanRequestDTO.ShopAddress != ""{
 		artisan.ShopAddress = UpdateArtisanRequestDTO.ShopAddress
 	}
-	if UpdateArtisanRequestDTO.Description != ""{
-		artisan.Description = UpdateArtisanRequestDTO.Description
-	}
-	if UpdateArtisanRequestDTO.ShopBanner != ""{
-		artisan.ShopBanner = UpdateArtisanRequestDTO.ShopBanner
-	}
 	if UpdateArtisanRequestDTO.UpdatedBy == ""{
 		artisan.UpdatedBy = "user"
 	}else{
 		artisan.UpdatedBy = UpdateArtisanRequestDTO.UpdatedBy
 	}
+
+	artisan.Description = UpdateArtisanRequestDTO.Description
+	artisan.ShopBanner = UpdateArtisanRequestDTO.ShopBanner
+	artisan.IsActive = UpdateArtisanRequestDTO.IsActive
 	
 	err = db.Save(&artisan).Error
 	if err != nil{

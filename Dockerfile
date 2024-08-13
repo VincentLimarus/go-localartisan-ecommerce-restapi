@@ -18,8 +18,10 @@ WORKDIR /app
 
 COPY --from=builder /app/main .
 
-EXPOSE 3000
+EXPOSE 8080
 
 CMD ["./main"]
 
-# docker pull vincentlim27/localartisansv1
+# docker pull vincentlim27/localartisans
+# docker image ls
+# docker run -p 8080:3000 [image_id]

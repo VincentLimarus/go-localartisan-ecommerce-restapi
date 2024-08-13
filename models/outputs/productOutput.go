@@ -27,3 +27,13 @@ type DeleteProductOutput struct {
 	BaseOutput
 	Data responsesDTO.ProductResponseDTO `json:"data"`
 }
+
+type GetAllProductByArtisanIDOutput struct {
+	BaseOutput
+	Data []responsesDTO.ProductResponseDTO `json:"data"`
+}
+
+type GetAllProductByCategoryIDOutput struct {
+	BaseOutput
+	Data []responsesDTO.ProductResponseDTO `json:"data"`
+}

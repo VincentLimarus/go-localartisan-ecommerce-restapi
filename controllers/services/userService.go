@@ -128,3 +128,4 @@ func AuthUserService(router *gin.RouterGroup) {
 	router.POST("/user/delete", DeleteUser)
 	router.POST("/user/change-password", ChangePasswordUser)
 }
+

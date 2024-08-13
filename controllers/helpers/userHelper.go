@@ -10,7 +10,6 @@ import (
 	"localArtisans/models/requestsDTO"
 	"localArtisans/models/responsesDTO"
 	"localArtisans/utils"
-	"log"
 
 	"github.com/google/uuid"
 )
@@ -19,18 +18,10 @@ func GetAllUser(GetAllUsersRequestDTO requestsDTO.GetAllUsersRequestDTO) (int, i
 	db := configs.GetDB()
 	var users []database.User
 
-	if GetAllUsersRequestDTO.Limit == 0 {
+	if GetAllUsersRequestDTO.Limit == 0  || GetAllUsersRequestDTO.Limit > 100{
 		output := outputs.BadRequestOutput{
 			Code: 400,
 			Message: "Bad Request: Limit cannot be 0",
-		}
-		return 400, output
-	}
-	
-	if GetAllUsersRequestDTO.Limit > 100 {
-		output := outputs.BadRequestOutput{
-			Code: 400,
-			Message: "Bad Request: Limit cannot be more than 100",
 		}
 		return 400, output
 	}
@@ -115,10 +106,6 @@ func GetUser(userID string) (int, interface{}) {
 			Message: "Not Found: Data not found",
 		}
 		return 404, output
-	}
-
-	if err != nil {
-		log.Println(("Artisan not found, This user is not an artisan"))
 	}
 
 	output := outputs.GetUserOutput{
@@ -295,6 +282,7 @@ func UpdateUser(UpdateUserRequestDTO requestsDTO.UpdateUserRequestDTO) (int, int
 		return 404, output
 	}
 
+	// Not NULL Update constraint -> ini tidak boleh null, kalo user tidak mengisi maka akan diisi oleh sistem
 	if UpdateUserRequestDTO.Name != "" {
 		user.Name = UpdateUserRequestDTO.Name
 	}
@@ -302,21 +290,17 @@ func UpdateUser(UpdateUserRequestDTO requestsDTO.UpdateUserRequestDTO) (int, int
 	if UpdateUserRequestDTO.Email != "" {
 		user.Email = UpdateUserRequestDTO.Email
 	}
-
-	if UpdateUserRequestDTO.PhoneNumber != "" {
-		user.PhoneNumber = UpdateUserRequestDTO.PhoneNumber
-	}
-
-	if UpdateUserRequestDTO.Address != "" {
-		user.Address = UpdateUserRequestDTO.Address
-	}
-	
 	if UpdateUserRequestDTO.UpdatedBy == "" {
 		user.UpdatedBy = "User"
 	} else {
 		user.UpdatedBy = UpdateUserRequestDTO.UpdatedBy
 	}
-	
+
+	// Nullable Update Constraint
+	user.PhoneNumber = UpdateUserRequestDTO.PhoneNumber	
+	user.Address = UpdateUserRequestDTO.Address	
+
+	// Boolean Update Constraint
 	user.IsActive = UpdateUserRequestDTO.IsActive
 
 	if err := db.Save(&user).Error; err != nil {

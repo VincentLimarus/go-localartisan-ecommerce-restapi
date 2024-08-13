@@ -13,6 +13,14 @@ type GetProductRequestDTO struct {
 	ID string `json:"id" form:"id" binding:"required"`
 }
 
+type GetAllProductByArtisanIDRequestDTO struct {
+	ArtisanID uuid.UUID `json:"artisan_id" form:"artisan_id" binding:"required"`
+}
+
+type GetAllProductByCategoryIDRequestDTO struct {
+	CategoryID uuid.UUID `json:"category_id" form:"category_id" binding:"required"`
+}
+
 type CreateProductRequestDTO struct {
 	CategoryID  uuid.UUID   `json:"category_id" form:"category_id" binding:"required"`
 	ArtisanID   uuid.UUID   `json:"artisan_id" form:"artisan_id" binding:"required"`

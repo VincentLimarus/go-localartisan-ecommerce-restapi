@@ -16,7 +16,7 @@ type RegisterUserRequestDTO struct {
 	Email           string `json:"email" form:"email" binding:"required"`
 	Password        string `json:"password" form:"password" binding:"required"`
 	ConfirmPassword string `json:"confirm_password" form:"confirm_password" binding:"required"`
-	IsActive        bool   `json:"is_active" form:"is_active" binding:"omitempty"`
+	IsActive        bool   `json:"is_active" form:"is_active" binding:"required"`
 	CreatedBy       string `json:"created_by" form:"created_by" binding:"omitempty"`
 }
 

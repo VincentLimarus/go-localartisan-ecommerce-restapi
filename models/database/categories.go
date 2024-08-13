@@ -7,7 +7,7 @@ import (
 )
 
 type Categories struct {
-	ID        uuid.UUID `gorm:"primaryKey;type:uuid;default:uuid_generate_v4(); not null"`
+	ID        uuid.UUID `gorm:"primaryKey;type:uuid;not null;default:uuid_generate_v4(); not null"`
 	Name      string    `gorm:"type:varchar(255);not null"`
 	Image     string    `gorm:"type:varchar(255);"`
 	IsActive  bool      `gorm:"type:boolean;not null;default:true"`

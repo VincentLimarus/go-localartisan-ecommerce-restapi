@@ -88,8 +88,40 @@ func DeleteProduct(c *gin.Context){
 	c.JSON(code, output)
 }
 
+func GetAllProductByArtisanID(c *gin.Context){
+	artisanID := c.Param("id")
+
+	if _, err := uuid.Parse(artisanID); err != nil {
+		output := outputs.BadRequestOutput{
+			Code:    400,
+			Message: fmt.Sprintf("Bad Request: %v", err),
+		}
+		c.JSON(http.StatusBadRequest, output)
+		return
+	}
+	code, output := helpers.GetAllProductByArtisanID(artisanID)
+	c.JSON(code, output)
+}
+
+func GetAllProductByCategoryID(c *gin.Context){	
+	categoryID := c.Param("id")
+
+	if _, err := uuid.Parse(categoryID); err != nil {
+		output := outputs.BadRequestOutput{
+			Code:    400,
+			Message: fmt.Sprintf("Bad Request: %v", err),
+		}
+		c.JSON(http.StatusBadRequest, output)
+		return
+	}
+	code, output := helpers.GetAllProductByCategoryID(categoryID)
+	c.JSON(code, output)
+}
+
 func BaseProductService(router *gin.RouterGroup) {
 	router.GET("/products", GetAllProduct)
+	router.GET("/products/artisan/:id", GetAllProductByArtisanID)
+	router.GET("/products/category/:id", GetAllProductByCategoryID)
 	router.GET("/product/:id", GetProductByID)
 }
 
