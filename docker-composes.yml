@@ -1,0 +1,22 @@
+version: "3"
+
+services:
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Vincent27
+      POSTGRES_DB: localArtisans
+    ports:
+      - "5432:5432"
+
+  web:
+    image: vincentlim27/localartisansv1
+    environment:
+      PORT: 3000
+      DB_URL: "host=host.docker.internal user=postgres password=Vincent27 dbname=localArtisans port=5432 sslmode=disable"
+      TIMEOUT: "3s"
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db

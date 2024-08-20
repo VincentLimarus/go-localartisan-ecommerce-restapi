@@ -38,6 +38,7 @@ func RoutersConfiguration() *gin.Engine{
 	services.BaseArtisanService(base)
 	services.BaseCategoryService(base)
 	services.BasePromoService(base)
+	services.BaseReviewService(base)
 
 	// --------------- Authenticated Routes ----------------
 	auth := router.Group("api/v1")
@@ -47,6 +48,7 @@ func RoutersConfiguration() *gin.Engine{
 	services.AuthArtisanService(auth)
 	services.AuthCategoryService(auth)
 	services.AuthPromoService(auth)
+	services.AuthReviewService(auth)
 
 	return router
 }
