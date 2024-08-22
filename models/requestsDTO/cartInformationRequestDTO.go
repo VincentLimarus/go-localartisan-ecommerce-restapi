@@ -10,28 +10,27 @@ type GetAllCartInformationsRequestDTO struct {
 }
 
 type GetAllCartInformationByCartIDRequestDTO struct {
-	CartID uuid.UUID `json:"cartID" form:"cartID" binding:"required"`
+	CartID uuid.UUID `json:"cart_id" form:"cart_id" binding:"required"`
 }
 
 type AddItemToCartRequestDTO struct {
-	CartID       uuid.UUID `json:"cartID" form:"cartID" binding:"required"`
-	ProductID    uuid.UUID `json:"productID" form:"productID" binding:"required"`
+	CartID       uuid.UUID `json:"cart_id" form:"cart_id" binding:"required"`
+	ProductID    uuid.UUID `json:"product_id" form:"product_id" binding:"required"`
 	Quantity     int       `json:"quantity" form:"quantity" binding:"required"`
-	PriceAtOrder float64   `json:"priceAtOrder" form:"priceAtOrder" binding:"required"`
-	IsActive     bool      `json:"isActive" form:"isActive" binding:"required"`
-	CreatedBy    string    `json:"createdBy" form:"createdBy" binding:"omitempty"`
+	PriceAtOrder float64   `json:"price_at_order" form:"price_at_order" binding:"omitempty"`
+	IsActive     bool      `json:"is_active" form:"is_active" binding:"required"`
+	CreatedBy    string    `json:"created_by" form:"created_by" binding:"omitempty"`
 }
 
 type UpdateItemInCartRequestDTO struct {
-	CartID       uuid.UUID `json:"cartID" form:"cartID" binding:"required"`
-	ProductID    uuid.UUID `json:"productID" form:"productID" binding:"required"`
+	CartID       uuid.UUID `json:"cart_id" form:"cart_id" binding:"required"`
+	ProductID    uuid.UUID `json:"product_id" form:"product_id" binding:"required"`
 	Quantity     int       `json:"quantity" form:"quantity" binding:"omitempty"`
-	PriceAtOrder float64   `json:"priceAtOrder" form:"priceAtOrder" binding:"omitempty"`
-	IsActive     bool      `json:"isActive" form:"isActive" binding:"omitempty"`
-	UpdatedBy    string    `json:"updatedBy" form:"updatedBy" binding:"omitempty"`
+	IsActive     bool      `json:"is_active" form:"is_active" binding:"omitempty"`
+	UpdatedBy    string    `json:"updated_by" form:"updated_by" binding:"omitempty"`
 }
 
 type DeleteItemInCartRequestDTO struct {
-	CartID    uuid.UUID `json:"cartID" form:"cartID" binding:"required"`
-	ProductID uuid.UUID `json:"productID" form:"productID" binding:"required"`
+	CartID    uuid.UUID `json:"cart_id" form:"cart_id" binding:"required"`
+	ProductID uuid.UUID `json:"product_id" form:"product_id" binding:"required"`
 }

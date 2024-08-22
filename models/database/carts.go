@@ -16,6 +16,6 @@ type Carts struct {
 	UpdatedAt 	time.Time 	`gorm:"autoUpdateTime;not null;default:now()"`
 
 	// Start of References
-	CartInformation []CartInformations `gorm:"foreignKey:CartID"`
+	CartInformation []CartInformations `gorm:"foreignKey:CartID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	// End of References
 }
