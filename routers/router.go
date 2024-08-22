@@ -49,6 +49,7 @@ func RoutersConfiguration() *gin.Engine{
 	services.AuthCategoryService(auth)
 	services.AuthPromoService(auth)
 	services.AuthReviewService(auth)
+	services.AuthCartService(auth)
 
 	return router
 }

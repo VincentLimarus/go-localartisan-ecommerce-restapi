@@ -6,10 +6,9 @@ import (
 	"github.com/google/uuid"
 )
 
-type CartInformation struct {
-	ID     			uuid.UUID 	`gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
-	CartID 			uuid.UUID 	`gorm:"type:uuid;not null"`
-	ProductID 		uuid.UUID 	`gorm:"type:uuid;not null"`
+type CartInformations struct {
+	CartID 			uuid.UUID 	`gorm:"type:uuid;primaryKey;not null"`
+	ProductID 		uuid.UUID 	`gorm:"type:uuid;primaryKey;not null"`
 	Quantity 		int 		`gorm:"type:int;not null"`
 	PriceAtOrder 	float64 	`gorm:"type:float;not null"`
 	IsActive 		bool 		`gorm:"type:boolean;not null"`

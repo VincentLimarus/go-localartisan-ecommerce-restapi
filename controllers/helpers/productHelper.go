@@ -113,6 +113,14 @@ func GetAllProductByCategoryID(categoryID string) (int, interface{}) {
 		return 404, output
 	}
 
+	if len(products) == 0 {
+		output := outputs.NotFoundOutput{
+			Code: 404,
+			Message: "Not Found: Products not exist",
+		}
+		return 404, output
+	}
+	
 	output := outputs.GetAllProductByCategoryIDOutput{}
 	output.Code = 200
 	output.Message = "Success: Products Found"
