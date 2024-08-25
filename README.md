@@ -28,3 +28,28 @@ JWT_SECRET_KEY = "YOUR_SECRET_KEY"
 
 TIMEOUT = "3s"
 ```
+**Pull / Download in ur Local**
+---
+Clone this repository into ur Local
+```
+git clone https://github.com/VincentLimarus/E-Commerce-LocalArtisans.git
+```
+Go to the Directory
+```
+cd E-Commerce-LocalArtisans
+```
+Install Dependency
+```
+go get .
+```
+Run Server 
+```
+go run .
+```
+
+**Download from Docker / Pull from Docker**
+---
+Docker Pull Command
+```
+docker pull vincentlim27/localartisanv1
+```
