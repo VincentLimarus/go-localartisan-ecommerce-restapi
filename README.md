@@ -22,7 +22,7 @@ APP_NAME = "Local Artisan"
 
 PORT = "3000"
 
-DB_URL = "host=localhostuser=<username> password=<password> dbname=mejabelajar_db port=5432 ssldmode=disable"
+DB_URL = "host=localhostuser=<username> password=<password> dbname=localartisan_db port=5432 ssldmode=disable"
 
 JWT_SECRET_KEY = "YOUR_SECRET_KEY"
 
