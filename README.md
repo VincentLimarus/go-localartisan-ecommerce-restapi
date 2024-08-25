@@ -6,6 +6,7 @@ So This Repository is going to answer the challenges by doing backend and databa
 **Tech Stack**
 ---------------
 **Server**: Go, Gin-Gonic, GORM, PostgreSQL, Docker
+**Helper Stack**: tablePlus, pgAdmin, Postman, Visual Studio Code, Git (bash, etc)
 
 **Static Documentation**
 ---
