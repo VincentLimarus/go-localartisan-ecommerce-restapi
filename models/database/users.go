@@ -21,7 +21,7 @@ type User struct {
 	UpdatedAt   time.Time 	`gorm:"autoUpdateTime;not null;default:now()"`
 
 	// Start of References
-	Artisan 	Artisans 	`gorm:"foreignKey:UserID"`
+	Artisan 	Artisans 	`gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	// Orders 		[]Orders 	`gorm:"foreignKey:UserID"`
 	// Carts 		[]Carts 	`gorm:"foreignKey:UserID"`
 	// Reviews 	[]Reviews 	`gorm:"foreignKey:UserID"`

@@ -23,9 +23,9 @@ type Products struct {
 	UpdatedAt   time.Time  `gorm:"type:timestamp;not null;default:now()"`
 
 	// Start of References
-	Promos   []Promos    `gorm:"foreignKey:ProductID"`
-	// Reviews  []Reviews  `gorm:"foreignKey:ProductID"`
-	// CartInformations []CartInformation `gorm:"foreignKey:ProductID"`
+	Promos   []Promos    `gorm:"foreignKey:ProductID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	Reviews  []Reviews  `gorm:"foreignKey:ProductID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	CartInformations []CartInformations `gorm:"foreignKey:ProductID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	// OrdersItems []OrdersItems `gorm:"foreignKey:ProductID"`
 	// End of References
 }

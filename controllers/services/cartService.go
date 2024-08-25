@@ -13,7 +13,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func GetCarts(c *gin.Context){
+func GetAllCarts(c *gin.Context){
 	var GetAllCartsRequestDTO requestsDTO.GetAllCartsRequestDTO
 	GetAllCartsRequestDTO.Page, GetAllCartsRequestDTO.Limit, GetAllCartsRequestDTO.OrderBy, GetAllCartsRequestDTO.OrderType = utils.PaginationHandler(GetAllCartsRequestDTO.Page, GetAllCartsRequestDTO.Limit, GetAllCartsRequestDTO.OrderBy, GetAllCartsRequestDTO.OrderType)
 	if err := c.ShouldBindWith(&GetAllCartsRequestDTO, binding.Form); err != nil {
@@ -28,7 +28,7 @@ func GetCarts(c *gin.Context){
 	c.JSON(code, output)
 }
 
-func GetCartByUserID(c *gin.Context){
+func GetAllCartByUserID(c *gin.Context){
 	cartID := c.Param("id")
 
 	if _, err := uuid.Parse(cartID); err != nil {
@@ -87,8 +87,8 @@ func DeleteCart(c *gin.Context){
 }
 
 func AuthCartService(router *gin.RouterGroup) {
-	router.GET("/carts", GetCarts)
-	router.GET("/carts/user/:id", GetCartByUserID)
+	router.GET("/carts", GetAllCarts)
+	router.GET("/carts/user/:id", GetAllCartByUserID)
 	router.GET("/cart/:id", GetCartByID)
 	router.POST("/cart/create", CreateCart)
 	router.POST("/cart/delete", DeleteCart)

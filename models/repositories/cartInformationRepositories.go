@@ -18,6 +18,18 @@ func GetAllCartInformationsByCartID(cartID string) ([]responsesDTO.CartInformati
 	return cartInformations, nil
 }
 
+func GetAllCartInformationsByCartIDForCartInformation(cartID string) ([]database.CartInformations, error) {
+	var cartInformations []database.CartInformations
+
+	db := configs.GetDB()
+	err := db.Table("cart_informations").Where("cart_id = ?", cartID).Find(&cartInformations).Error
+
+	if err != nil {
+		return cartInformations, err
+	}
+	return cartInformations, nil
+}
+
 func GetCartByID(cartID string) (database.Carts, error) {
 	var cart database.Carts
 
