@@ -1,4 +1,4 @@
-**Local Artisan - E-Commerce**
+**Local Artisan - Simple E-Commerce**
 --------------------------------
 Indonesian artisans struggle to expand their market and showcase their craftsmanship beyond local communities. A platform is needed to help them display products, sell online, and promote Indonesia's cultural heritage.
 So This Repository is going to answer the challenges by doing backend and database development. I'll use Golang with Gin and GORM alongside PostgreSQL for efficient data management. This approach ensures the E-commerce Platform for Local Artisans tackles the practical issues faced by Indonesian artisans while also preserving and promoting Indonesia’s cultural heritage digitally.
@@ -20,15 +20,22 @@ Entity Relationship Diagram: https://drawsql.app/teams/sen-2/diagrams/e-commerce
 **Env Files**
 ---
 ```
-APP_NAME = "Local Artisan"
+APP_NAME = Local Artisans
 
-PORT = "3000"
+DB_HOST = localArtisan
 
-DB_URL = "host=localhostuser=<username> password=<password> dbname=localartisan_db port=5432 ssldmode=disable"
+DB_PORT = 5432
 
-JWT_SECRET_KEY = "YOUR_SECRET_KEY"
+DB_USER = postgres
 
-TIMEOUT = "3s"
+DB_PASSWORD = database_password
+
+DB_NAME = database_name
+
+JWT_SECRET_KEY="UR_SECRET_KEY"
+
+TIMEOUT="3s"
+
 ```
 **Pull / Download in ur Local**
 ---
