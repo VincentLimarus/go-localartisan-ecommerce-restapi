@@ -12,13 +12,8 @@ type Carts struct {
 	IsActive 	bool 		`gorm:"type:boolean;not null"`
 	CreatedBy 	string 		`gorm:"type:varchar(255);not null; default:'system'"`
 	UpdatedBy 	string 		`gorm:"type:varchar(255);not null; default:'system'"`
-<<<<<<< HEAD
-	CreatedAt time.Time `gorm:"autoCreateTime;not null;default:now()"`
-	UpdatedAt time.Time `gorm:"autoUpdateTime;not null;default:now()"`
-=======
-	CreatedAt	time.Time 	`gorm:"autoCreateTime;not null;default:now()"`
-	UpdatedAt 	time.Time 	`gorm:"autoUpdateTime;not null;default:now()"`
->>>>>>> sen.be
+	CreatedAt 	time.Time `gorm:"autoCreateTime;not null;default:now()"`
+	UpdatedAt 	time.Time `gorm:"autoUpdateTime;not null;default:now()"`
 
 	// Start of References
 	CartInformation []CartInformations `gorm:"foreignKey:CartID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
