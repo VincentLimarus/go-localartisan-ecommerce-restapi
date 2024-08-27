@@ -81,7 +81,7 @@ func GetAllCarts(GetAllCartsRequestDTO requestsDTO.GetAllCartsRequestDTO) (int, 
 			UpdatedBy: cart.UpdatedBy,
 			CreatedAt: cart.CreatedAt,
 			UpdatedAt: cart.UpdatedAt,
-			CartInformation: cartInformations,
+			CartInformations: cartInformations,
 		})
 	}
 	return 200, output
@@ -131,7 +131,7 @@ func GetAllCartsByUserID(userID string) (int, interface{}){
 			UpdatedBy: cart.UpdatedBy,
 			CreatedAt: cart.CreatedAt,
 			UpdatedAt: cart.UpdatedAt,
-			CartInformation: cartInformations,
+			CartInformations: cartInformations,
 		})
 	}
 	return 200, output
@@ -171,7 +171,7 @@ func GetCartByID(cartID string) (int, interface{}){
 		UpdatedBy: cart.UpdatedBy,
 		CreatedAt: cart.CreatedAt,
 		UpdatedAt: cart.UpdatedAt,
-		CartInformation: cartInformations,
+		CartInformations: cartInformations,
 	}
 	return 200, output
 }
@@ -287,7 +287,7 @@ func DeleteCart(DeleteCartRequestDTO requestsDTO.DeleteCartRequestDTO) (int, int
 		UpdatedBy: cart.UpdatedBy,
 		CreatedAt: cart.CreatedAt,
 		UpdatedAt: cart.UpdatedAt,
-		CartInformation: cartInformations,
+		CartInformations: cartInformations,
 	}
 	return 200, output
 }

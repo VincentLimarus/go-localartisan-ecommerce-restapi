@@ -14,5 +14,6 @@ type CartResponseDTO struct {
 	UpdatedBy string    `json:"updated_by"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
-	CartInformation []CartInformationResponseDTO `json:"cart_information"`
+	CartInformations []CartInformationResponseDTO `json:"cart_informations"`
+	AddProductToCartInformation CartInformationResponseDTO `json:"cart_information"`
 }

@@ -177,7 +177,7 @@ func CreatePromo(CreatePromoRequestDTO requestsDTO.CreatePromosRequestDTO) (int,
 		CreatedBy: CreatePromoRequestDTO.CreatedBy,
 		IsActive: CreatePromoRequestDTO.IsActive,
 	}
-
+	
 	err := db.Create(&promo).Error
 
 	if err != nil{
@@ -232,16 +232,28 @@ func UpdatePromo(UpdatePromoRequestDTO requestsDTO.UpdatePromosRequestDTO) (int,
 	// Not Null Update Constraint -> ini tidak boleh null, kalo user tidak mengisi maka akan diisi oleh sistem
 	if promo.ProductID == uuid.Nil{
 		promo.ProductID = UpdatePromoRequestDTO.ProductID
+	} else {
+		promo.ProductID = UpdatePromoRequestDTO.ProductID
 	}
+
 	if promo.Name == ""{
 		promo.Name = UpdatePromoRequestDTO.Name
+	} else {
+		promo.Name = UpdatePromoRequestDTO.Name
 	}
+
 	if promo.Description == ""{
 		promo.Description = UpdatePromoRequestDTO.Description
+	} else {
+		promo.Description = UpdatePromoRequestDTO.Description
 	}
+
 	if promo.PromoDiscount == 0{
 		promo.PromoDiscount = UpdatePromoRequestDTO.PromoDiscount
+	} else {
+		promo.PromoDiscount = UpdatePromoRequestDTO.PromoDiscount	
 	}
+
 	if promo.UpdatedBy == ""{
 		promo.UpdatedBy = "user"
 	}else{
@@ -264,7 +276,7 @@ func UpdatePromo(UpdatePromoRequestDTO requestsDTO.UpdatePromosRequestDTO) (int,
 	output := outputs.UpdatePromoOutput{
 		BaseOutput: outputs.BaseOutput{
 			Code: 200,
-			Message: "Success Deleted",
+			Message: "Success Update",
 		},
 		Data: responsesDTO.PromoResponseDTO{
 			ID: promo.ID,

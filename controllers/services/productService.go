@@ -118,6 +118,40 @@ func GetAllProductByCategoryID(c *gin.Context){
 	c.JSON(code, output)
 }
 
+func AddProductToCart(c *gin.Context) {
+	var AddProductToCart requestsDTO.AddProductToCartRequestDTO
+
+	// Bind JSON body ke AddProductToCartRequestDTO
+	if err := c.ShouldBindJSON(&AddProductToCart); err != nil {
+		output := outputs.BadRequestOutput{
+			Code:    400,
+			Message: fmt.Sprintf("Bad Request: %v", err),
+		}
+		c.JSON(http.StatusBadRequest, output)
+		return
+	}
+
+	// Ambil email dari context
+	email, exists := c.Get("user_email")
+	if !exists {
+		output := outputs.UnauthorizedOutput{
+			Code:    401,
+			Message: "Unauthorized: User email not found in context",
+		}
+		c.JSON(http.StatusUnauthorized, output)
+		return
+	}
+
+	// Buat LoginUserRequestDTO dengan email yang diambil dari context
+	LoginUser := requestsDTO.LoginUserRequestDTO{
+		Email: email.(string),
+	}
+
+	// Panggil fungsi helper dengan data yang telah di-bind dan LoginUser
+	code, output := helpers.AddProductToCart(AddProductToCart, LoginUser)
+	c.JSON(code, output)
+}
+
 func BaseProductService(router *gin.RouterGroup) {
 	router.GET("/products", GetAllProduct)
 	router.GET("/products/artisan/:id", GetAllProductByArtisanID)
@@ -129,4 +163,5 @@ func AuthProductService(router *gin.RouterGroup) {
 	router.POST("/product/create", CreateProduct)
 	router.POST("/product/update", UpdateProduct)
 	router.POST("/product/delete", DeleteProduct)
+	router.POST("/product/add-to-cart", AddProductToCart)
 }

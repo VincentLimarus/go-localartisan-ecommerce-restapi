@@ -37,3 +37,13 @@ type GetAllProductByCategoryIDOutput struct {
 	BaseOutput
 	Data []responsesDTO.ProductResponseDTO `json:"data"`
 }
+
+type AddProductToCartOutput struct {
+	BaseOutput
+	Data responsesDTO.CartResponseDTO `json:"data"`
+}
+
+type CheckOutProductRequestDTO struct {
+	BaseOutput
+	Data responsesDTO.CartResponseDTO `json:"data"`
+}

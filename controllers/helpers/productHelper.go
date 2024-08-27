@@ -8,6 +8,7 @@ import (
 	"localArtisans/models/repositories"
 	"localArtisans/models/requestsDTO"
 	"localArtisans/models/responsesDTO"
+	"localArtisans/utils"
 )
 
 func GetAllProduct(GetAllProductRequestDTO requestsDTO.GetAllProductRequestDTO) (int, interface{}) {
@@ -232,26 +233,36 @@ func UpdateProduct(UpdateProductRequestDTO requestsDTO.UpdateProductRequestDTO) 
 	// Not NULL Update constraint -> ini tidak boleh null, kalo user tidak mengisi maka akan diisi oleh sistem
 	if UpdateProductRequestDTO.Name != "" {
 		product.Name = UpdateProductRequestDTO.Name
+	} else{
+		product.Name = UpdateProductRequestDTO.Name
 	}
+
 	if UpdateProductRequestDTO.UpdatedBy == "" {
 		product.UpdatedBy = "user"
 	} else{
 		product.UpdatedBy = UpdateProductRequestDTO.UpdatedBy
 	}
+
 	if UpdateProductRequestDTO.Price != 0 {
 		product.Price = UpdateProductRequestDTO.Price
+	} else {
+		product.Price = UpdateProductRequestDTO.Price
 	}
+
 	if UpdateProductRequestDTO.Description != "" {
 		product.Description = UpdateProductRequestDTO.Description
+	} else{
+		product.Description = UpdateProductRequestDTO.Description
 	}
+
 	if UpdateProductRequestDTO.Quantity != 0 {
+		product.Quantity = UpdateProductRequestDTO.Quantity
+	} else {
 		product.Quantity = UpdateProductRequestDTO.Quantity
 	}
 
 	// Boolean Update Constraint
 	product.IsActive = UpdateProductRequestDTO.IsActive
-
-	
 
 	err = db.Save(&product).Error
 
@@ -328,5 +339,137 @@ func DeleteProduct(DeleteProductRequestDTO requestsDTO.DeleteProductRequestDTO) 
 		CreatedAt:   product.CreatedAt,
 		UpdatedAt:   product.UpdatedAt,
 	}
+	return 200, output
+}
+
+func AddProductToCart(AddProductToCartRequestDTO requestsDTO.AddProductToCartRequestDTO, LoginUser requestsDTO.LoginUserRequestDTO) (int, interface{}) {
+	db := configs.GetDB()
+	var user database.User
+	var carts database.Carts
+	var product database.Products
+
+	err := db.Table("users").Where("email = ?", LoginUser.Email).First(&user).Error
+	UserID := user.ID
+
+	if err == nil && AddProductToCartRequestDTO.CartID == ""{
+		carts = database.Carts{
+			UserID: UserID,
+			IsActive: AddProductToCartRequestDTO.IsActive,
+			CreatedBy: AddProductToCartRequestDTO.CreatedBy,
+		}	
+		err = db.Create(&carts).Error
+
+		if err != nil {
+			output := outputs.InternalServerErrorOutput{
+				Code: 500,
+				Message: "Internal Server Error" + err.Error(),
+			}
+			return 500, output
+		}
+	} 
+	err = db.Table("carts").Where("user_id = ?", UserID).First(&carts).Error
+	if err != nil {
+		output := outputs.NotFoundOutput{
+			Code: 404,
+			Message: "Not Found: Cart not exist",
+		}
+		return 404, output
+	}
+
+	err = db.Table("products").Where("id = ?", AddProductToCartRequestDTO.ID).First(&product).Error
+
+	if err != nil {
+		output := outputs.NotFoundOutput{
+			Code: 404,
+			Message: "Not Found: Product not exist",
+		}
+		return 404, output
+	}
+
+	cartInformation := database.CartInformations{
+		CartID:    carts.ID,
+		ProductID:  utils.StringToUUID(AddProductToCartRequestDTO.ID),
+		Quantity:  AddProductToCartRequestDTO.Quantity,
+		PriceAtOrder :    product.Price,
+		IsActive:  AddProductToCartRequestDTO.IsActive,
+		CreatedBy: AddProductToCartRequestDTO.CreatedBy,
+	}
+
+	// if the product already exist in the cart, then the quantity will be added
+	var cartInfo database.CartInformations
+	err = db.Table("cart_informations").Where("cart_id = ? AND product_id = ?", carts.ID, AddProductToCartRequestDTO.ID).First(&cartInfo).Error
+
+	if err == nil {
+		cartInformation.Quantity = cartInfo.Quantity + AddProductToCartRequestDTO.Quantity
+		err = db.Table("cart_informations").Where("cart_id = ? AND product_id = ?", carts.ID, AddProductToCartRequestDTO.ID).Update("quantity", cartInformation.Quantity).Error
+		if err != nil {
+			output := outputs.InternalServerErrorOutput{
+				Code: 500,
+				Message: "Internal Server Error" + err.Error(),
+			}
+			return 500, output
+		}
+		output := outputs.AddProductToCartOutput{}
+		output.Code = 200
+		output.Message = "Success: Product Added to Cart"
+
+		var AddProductToCartInformation responsesDTO.CartInformationResponseDTO
+		AddProductToCartInformation, err = repositories.GetCartInformationByCartIDAndProductID(utils.UUIDToString(carts.ID), AddProductToCartRequestDTO.ID)
+
+		if err != nil {
+			output := outputs.InternalServerErrorOutput{
+				Code: 500,
+				Message: "Internal Server Error" + err.Error(),
+			}
+			return 500, output
+		}
+		output.Data = responsesDTO.CartResponseDTO{
+			ID:          carts.ID,
+			UserID:      carts.UserID,
+			IsActive:    carts.IsActive,
+			CreatedBy:   carts.CreatedBy,
+			CreatedAt:   carts.CreatedAt,
+			UpdatedBy:   carts.UpdatedBy,
+			UpdatedAt:   carts.UpdatedAt,	
+			AddProductToCartInformation: AddProductToCartInformation,
+		}
+		return 200, output
+	}
+
+	err = db.Create(&cartInformation).Error
+
+	if err != nil {
+		output := outputs.InternalServerErrorOutput{
+			Code: 500,
+			Message: "Internal Server Error" + err.Error(),
+		}
+		return 500, output
+	}
+
+	output := outputs.AddProductToCartOutput{}
+	output.Code = 200
+	output.Message = "Success: Product Added to Cart"
+
+	var AddProductToCartInformation responsesDTO.CartInformationResponseDTO
+	AddProductToCartInformation, err = repositories.GetCartInformationByCartIDAndProductID(utils.UUIDToString(carts.ID), AddProductToCartRequestDTO.ID)
+
+	if err != nil {
+		output := outputs.InternalServerErrorOutput{
+			Code: 500,
+			Message: "Internal Server Error" + err.Error(),
+		}
+		return 500, output
+	}
+	output.Data = responsesDTO.CartResponseDTO{
+		ID:          carts.ID,
+		UserID:      carts.UserID,
+		IsActive:    carts.IsActive,
+		CreatedBy:   carts.CreatedBy,
+		CreatedAt:   carts.CreatedAt,
+		UpdatedBy:   carts.UpdatedBy,
+		UpdatedAt:   carts.UpdatedAt,	
+		AddProductToCartInformation: AddProductToCartInformation,
+	}
+	
 	return 200, output
 }

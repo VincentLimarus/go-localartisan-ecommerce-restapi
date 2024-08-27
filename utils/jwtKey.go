@@ -9,31 +9,49 @@ import (
 	"github.com/google/uuid"
 )
 
-func CreateJWTToken(id uuid.UUID) (string, error) {
+func CreateJWTToken(id uuid.UUID, email string) (string, error) {
+	idString := id.String()
+
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"sub": id,
-		"exp": time.Now().Add(time.Hour * 12).Unix(),
+		"sub":   idString,
+		"email": email,
+		"exp":   time.Now().Add(time.Hour * 12).Unix(),
 	})
+
 	tokenString, err := token.SignedString([]byte(os.Getenv("JWT_SECRET_KEY")))
-	return tokenString, err
+	if err != nil {
+		return "", err
+	}
+
+	return tokenString, nil
 }
 
-func ValidateJWTToken(tokenString string) (bool, error) {
+func ValidateJWTToken(tokenString string) (bool, string, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		return []byte(os.Getenv("JWT_SECRET_KEY")), nil
 	})
-	if err != nil || !token.Valid {
-		return false, err
+	if err != nil {
+		return false, "", err
+	}
+
+	if !token.Valid {
+		return false, "", errors.New("token is invalid")
 	}
 
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok {
-		return false, err
+		return false, "", errors.New("unable to parse claims")
 	}
 
-	if float64(time.Now().Unix()) > claims["exp"].(float64) {
-		return false, errors.New("token is expired")
+	exp, ok := claims["exp"].(float64)
+	if !ok || float64(time.Now().Unix()) > exp {
+		return false, "", errors.New("token is expired")
 	}
 
-	return true, nil
+	email, ok := claims["email"].(string)
+	if !ok {
+		return false, "", errors.New("email claim is missing or invalid")
+	}
+
+	return true, email, nil
 }

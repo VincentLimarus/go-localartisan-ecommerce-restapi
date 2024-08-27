@@ -7,6 +7,7 @@ import (
 )
 
 type CartInformationResponseDTO struct {
+	ID           uuid.UUID    `json:"id"`
 	CartID       uuid.UUID    `json:"cartID"`
 	ProductID    uuid.UUID    `json:"productID"`
 	Quantity     int       `json:"quantity"`

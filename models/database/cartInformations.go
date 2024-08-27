@@ -7,8 +7,9 @@ import (
 )
 
 type CartInformations struct {
-	CartID 			uuid.UUID 	`gorm:"type:uuid;not null;primaryKey"`
-	ProductID 		uuid.UUID 	`gorm:"type:uuid;not null;primaryKey"`
+	ID 				uuid.UUID 	`gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
+	CartID 			uuid.UUID 	`gorm:"type:uuid;not null;"`
+	ProductID 		uuid.UUID 	`gorm:"type:uuid;not null;"`
 	Quantity 		int 		`gorm:"type:int;not null"`
 	PriceAtOrder 	float64 	`gorm:"type:float;not null"`
 	IsActive 		bool 		`gorm:"type:boolean;not null"`

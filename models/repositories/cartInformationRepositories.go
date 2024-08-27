@@ -18,6 +18,18 @@ func GetAllCartInformationsByCartID(cartID string) ([]responsesDTO.CartInformati
 	return cartInformations, nil
 }
 
+func GetCartInformationByCartIDAndProductID(cartID string, productID string) (responsesDTO.CartInformationResponseDTO, error) {
+	var cartInformation responsesDTO.CartInformationResponseDTO
+
+	db := configs.GetDB()
+	err := db.Table("cart_informations").Where("cart_id = ? AND product_id = ?", cartID, productID).First(&cartInformation).Error
+
+	if err != nil {
+		return cartInformation, err
+	}
+	return cartInformation, nil
+}
+
 func GetAllCartInformationsByCartIDForCartInformation(cartID string) ([]database.CartInformations, error) {
 	var cartInformations []database.CartInformations
 

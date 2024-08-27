@@ -207,59 +207,53 @@ func LoginUser(LoginUserRequestDTO requestsDTO.LoginUserRequestDTO) (int, interf
 
 	if err != nil {
 		output := outputs.InternalServerErrorOutput{
-			Code: 500,
+			Code:    500,
 			Message: fmt.Sprintf("Internal Server Error: %v", err),
 		}
 		return 500, output, err.Error()
 	}
-	
-	token, tokenErr := utils.CreateJWTToken(user.ID)
-
-	if tokenErr != nil{
-		output := outputs.InternalServerErrorOutput{
-			Code: 500,
-			Message: fmt.Sprintf("Internal Server Error: %v", tokenErr),
-		}
-		return 500, output, tokenErr.Error()
-	}
-
-	if user.ID == (database.User{}).ID {
-		output := outputs.NotFoundOutput{
-			Code: 404,
-			Message: "Not Found: Data not found",
-		}
-		return 404, output, "Token not found"
-	}
 
 	if !utils.ComparePassword(user.Password, LoginUserRequestDTO.Password) {
 		output := outputs.BadRequestOutput{
-			Code: 400,
+			Code:    400,
 			Message: "Bad Request: Password is incorrect",
 		}
 		return 400, output, "Token not found"
 	}
 
+	token, tokenErr := utils.CreateJWTToken(user.ID, user.Email)
+
+	if tokenErr != nil {
+		output := outputs.InternalServerErrorOutput{
+			Code:    500,
+			Message: fmt.Sprintf("Internal Server Error: %v", tokenErr),
+		}
+		return 500, output, tokenErr.Error()
+	}
+
 	output := outputs.LoginUserOutput{
 		BaseOutput: outputs.BaseOutput{
-			Code: 200,
+			Code:    200,
 			Message: "Success: User logged in",
 		},
-		Data : responsesDTO.UserResponseDTO{
-			ID: user.ID,
-			Name: user.Name,
-			Email: user.Email,
-			PhoneNumber: user.PhoneNumber,
-			Address: user.Address,
-			IsArtisan: user.IsArtisan,
-			IsActive: user.IsActive,
-			CreatedBy: user.CreatedBy,
-			UpdatedBy: user.UpdatedBy,
-			CreatedAt: user.CreatedAt,
-			UpdatedAt: user.UpdatedAt,
+		Data: responsesDTO.UserResponseDTO{
+			ID:           user.ID,
+			Name:         user.Name,
+			Email:        user.Email,
+			PhoneNumber:  user.PhoneNumber,
+			Address:      user.Address,
+			IsArtisan:    user.IsArtisan,
+			IsActive:     user.IsActive,
+			CreatedBy:    user.CreatedBy,
+			UpdatedBy:    user.UpdatedBy,
+			CreatedAt:    user.CreatedAt,
+			UpdatedAt:    user.UpdatedAt,
 		},
 	}
+
 	return 200, output, token
 }
+
 
 func UpdateUser(UpdateUserRequestDTO requestsDTO.UpdateUserRequestDTO) (int, interface{}) {	
 	db := configs.GetDB()
@@ -285,11 +279,16 @@ func UpdateUser(UpdateUserRequestDTO requestsDTO.UpdateUserRequestDTO) (int, int
 	// Not NULL Update constraint -> ini tidak boleh null, kalo user tidak mengisi maka akan diisi oleh sistem
 	if UpdateUserRequestDTO.Name != "" {
 		user.Name = UpdateUserRequestDTO.Name
+	} else {
+		user.Name = UpdateUserRequestDTO.Name
 	}
 
 	if UpdateUserRequestDTO.Email != "" {
 		user.Email = UpdateUserRequestDTO.Email
+	} else {
+		user.Email = UpdateUserRequestDTO.Email
 	}
+	
 	if UpdateUserRequestDTO.UpdatedBy == "" {
 		user.UpdatedBy = "User"
 	} else {

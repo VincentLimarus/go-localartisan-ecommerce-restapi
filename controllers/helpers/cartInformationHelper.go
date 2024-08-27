@@ -187,6 +187,8 @@ func UpdateItemInCart(UpdateItemInCart requestsDTO.UpdateItemInCartRequestDTO) (
 
 	if UpdateItemInCart.Quantity != 0 {
 		cartInformation.Quantity = UpdateItemInCart.Quantity
+	} else {
+		cartInformation.Quantity = UpdateItemInCart.Quantity
 	}
 
 	if UpdateItemInCart.UpdatedBy == "" {

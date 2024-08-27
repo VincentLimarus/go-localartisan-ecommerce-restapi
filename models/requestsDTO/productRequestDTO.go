@@ -47,3 +47,18 @@ type DeleteProductRequestDTO struct {
 	// Only admin can delete (Artisan).
 	ID string `json:"id" form:"id" binding:"required"`
 }
+
+type AddProductToCartRequestDTO struct {
+	ID 	 			string `json:"id" form:"id" binding:"required"`
+	CartID 			string `json:"cart_id" form:"cart_id" binding:"omitempty"`
+	Quantity 		int `json:"quantity" form:"quantity" binding:"required"` // Order Quantity
+	IsActive 		bool `json:"is_active" form:"is_active" binding:"required"`
+	CreatedBy 		string `json:"created_by" form:"created_by" binding:"omitempty"`
+}
+
+type CheckOutProductRequestDTO struct {
+	ID 	 			string `json:"id" form:"id" binding:"required"`
+	Quantity 		int `json:"quantity" form:"quantity" binding:"required"` // Order Quantity
+	IsActive 		bool `json:"is_active" form:"is_active" binding:"required"`
+	CreatedBy 		string `json:"created_by" form:"created_by" binding:"omitempty"`
+}	
