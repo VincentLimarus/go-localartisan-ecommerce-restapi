@@ -17,7 +17,6 @@ type AddItemToCartRequestDTO struct {
 	CartID       uuid.UUID `json:"cart_id" form:"cart_id" binding:"required"`
 	ProductID    uuid.UUID `json:"product_id" form:"product_id" binding:"required"`
 	Quantity     int       `json:"quantity" form:"quantity" binding:"required"`
-	PriceAtOrder float64   `json:"price_at_order" form:"price_at_order" binding:"omitempty"`
 	IsActive     bool      `json:"is_active" form:"is_active" binding:"required"`
 	CreatedBy    string    `json:"created_by" form:"created_by" binding:"omitempty"`
 }

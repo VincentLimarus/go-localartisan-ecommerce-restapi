@@ -62,6 +62,7 @@ func GetAllCartInformations(GetAllCartInformations requestsDTO.GetAllCartInforma
 
 	for _, cartInformation := range cartInformations {
 		output.Data = append(output.Data, responsesDTO.CartInformationResponseDTO{
+			ID : cartInformation.ID,
 			CartID: cartInformation.CartID,
 			ProductID: cartInformation.ProductID,
 			Quantity: cartInformation.Quantity,
@@ -104,6 +105,7 @@ func GetAllCartInformationByCartID(cartID string) (int, interface{}) {
 
 	for _, cartInformation := range cartInformations {
 		output.Data = append(output.Data, responsesDTO.CartInformationResponseDTO{
+			ID: cartInformation.ID,
 			CartID: cartInformation.CartID,
 			ProductID: cartInformation.ProductID,
 			Quantity: cartInformation.Quantity,
@@ -158,6 +160,7 @@ func AddItemToCart(AddItemToCart requestsDTO.AddItemToCartRequestDTO) (int, inte
 	output.Code = 200
 	output.Message = "Success: Item Added to Cart"
 	output.Data = responsesDTO.CartInformationResponseDTO{
+		ID : cartInformation.ID,
 		CartID: AddItemToCart.CartID,
 		ProductID: AddItemToCart.ProductID,
 		Quantity: AddItemToCart.Quantity,
@@ -214,6 +217,7 @@ func UpdateItemInCart(UpdateItemInCart requestsDTO.UpdateItemInCartRequestDTO) (
 	output.Code = 200
 	output.Message = "Success: Item Updated"
 	output.Data = responsesDTO.CartInformationResponseDTO{
+		ID : cartInformation.ID,
 		CartID: cartInformation.CartID,
 		ProductID: cartInformation.ProductID,
 		Quantity: cartInformation.Quantity,
@@ -255,6 +259,7 @@ func DeleteItemInCart(DeleteItemInCart requestsDTO.DeleteItemInCartRequestDTO) (
 	output.Code = 200
 	output.Message = "Success: Item Deleted"
 	output.Data = responsesDTO.CartInformationResponseDTO{
+		ID: cartInformation.ID,
 		CartID: cartInformation.CartID,
 		ProductID: cartInformation.ProductID,
 		Quantity: cartInformation.Quantity,
