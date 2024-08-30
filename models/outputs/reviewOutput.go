@@ -2,28 +2,28 @@ package outputs
 
 import "localArtisans/models/responsesDTO"
 
-type GetAllReviewsResponse struct {
+type GetAllReviewsOutput struct {
 	BaseOutput
 	PaginationOutput
 	Data []responsesDTO.ReviewsResponseDTO `json:"data"`
 }
 
-type GetAllReviewsByProductIDResponse struct {
+type GetAllReviewsByProductIDOutput struct {
 	BaseOutput
 	Data []responsesDTO.ReviewsResponseDTO `json:"data"`
 }
 
-type GetReviewResponse struct {
+type GetReviewOutput struct {
 	BaseOutput
 	Data responsesDTO.ReviewsResponseDTO `json:"data"`
 }
 
-type CreateReviewResponse struct {
+type CreateReviewOutput struct {
 	BaseOutput
 	Data responsesDTO.ReviewsResponseDTO `json:"data"`
 }
 
-type DeleteReviewResponse struct {
+type DeleteReviewOutput struct {
 	BaseOutput
 	Data responsesDTO.ReviewsResponseDTO `json:"data"`
 }

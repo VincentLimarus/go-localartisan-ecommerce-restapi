@@ -8,6 +8,8 @@ import (
 	"localArtisans/models/repositories"
 	"localArtisans/models/requestsDTO"
 	"localArtisans/models/responsesDTO"
+
+	"github.com/google/uuid"
 )
 
 func GetAllReviews(GetAllReviewsRequestDTO requestsDTO.GetAllReviewsRequestDTO) (int, interface{}) {
@@ -51,7 +53,7 @@ func GetAllReviews(GetAllReviewsRequestDTO requestsDTO.GetAllReviewsRequestDTO) 
 		totalPage = int(totalData / int64(GetAllReviewsRequestDTO.Limit)) + 1
 	}
 
-	output := outputs.GetAllReviewsResponse{}
+	output := outputs.GetAllReviewsOutput{}
 	output.Page = GetAllReviewsRequestDTO.Page	
 	output.Limit = GetAllReviewsRequestDTO.Limit
 	output.OrderBy = GetAllReviewsRequestDTO.OrderBy
@@ -78,6 +80,49 @@ func GetAllReviews(GetAllReviewsRequestDTO requestsDTO.GetAllReviewsRequestDTO) 
 	return 200, output
 }
 
+func GetReviewByID(id string) (int, interface{}){
+	var review database.Reviews
+	review, err := repositories.GetReviewByID(id)
+
+	if err != nil {
+		output := outputs.InternalServerErrorOutput{
+			Code: 500,
+			Message: "Internal Server Error" + err.Error(),
+		}
+		return 500, output
+	}
+
+	if review.ID == uuid.Nil {
+		output := outputs.NotFoundOutput{
+			Code: 404,
+			Message: "Not Found: Review not exist",
+		}
+		return 404, output
+	}
+
+	output := outputs.GetReviewOutput{
+		BaseOutput: outputs.BaseOutput{
+			Code: 200,
+			Message: "Success",
+		},
+		Data: responsesDTO.ReviewsResponseDTO{
+			ID: review.ID,
+			ProductID: review.ProductID,
+			UserID: review.UserID,
+			Comment: review.Comment,
+			Rating: review.Rating,
+			IsActive: review.IsActive,
+			CreatedBy: review.CreatedBy,
+			UpdatedBy: review.UpdatedBy,
+			CreatedAt: review.CreatedAt,
+			UpdatedAt: review.UpdatedAt,
+		},
+	}
+
+	return 200, output
+}
+
+
 func GetAllReviewsByProductID(productID string) (int, interface{}){
 	var reviews []responsesDTO.ReviewsResponseDTO
 	reviews, err := repositories.GetAllReviewsByProductID(productID)
@@ -97,7 +142,7 @@ func GetAllReviewsByProductID(productID string) (int, interface{}){
 		}
 		return 404, output
 	}
-	output := outputs.GetAllReviewsResponse{}
+	output := outputs.GetAllReviewsByProductIDOutput{}
 	output.Code = 200
 	output.Message = "Success: Reviews Found"
 	output.Data = reviews
@@ -125,7 +170,7 @@ func CreateReview(CreateReviewRequestDTO requestsDTO.CreateReviewRequestDTO) (in
 		return 500, output
 	}
 
-	output := outputs.CreateReviewResponse{
+	output := outputs.CreateReviewOutput{
 		BaseOutput: outputs.BaseOutput{
 			Code: 200,
 			Message: "Success: Review Created",
@@ -149,7 +194,7 @@ func CreateReview(CreateReviewRequestDTO requestsDTO.CreateReviewRequestDTO) (in
 func DeleteReview(DeleteReviewRequestDTO requestsDTO.DeleteReviewRequestDTO) (int, interface{}) {
 	db := configs.GetDB()
 	var review database.Reviews
-	err := db.Where("id = ? AND user_id = ?", DeleteReviewRequestDTO.ID, DeleteReviewRequestDTO.UserID).First(&review).Error
+	err := db.Where("id = ?", DeleteReviewRequestDTO.ID).First(&review).Error
 
 	if err != nil {
 		output := outputs.NotFoundOutput{
@@ -168,9 +213,9 @@ func DeleteReview(DeleteReviewRequestDTO requestsDTO.DeleteReviewRequestDTO) (in
 		return 500, output
 	}
 
-	output := outputs.DeleteReviewResponse{}
+	output := outputs.DeleteReviewOutput{}
 	output.Code = 200
-	output.Message = "Success: User deleted"
+	output.Message = "Success: Review deleted"
 	output.Data = responsesDTO.ReviewsResponseDTO{
 		ID: review.ID,
 		ProductID: review.ProductID,

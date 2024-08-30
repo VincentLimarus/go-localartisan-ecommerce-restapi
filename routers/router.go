@@ -39,7 +39,7 @@ func RoutersConfiguration() *gin.Engine{
 	services.BaseCategoryService(base)
 	services.BasePromoService(base)
 	services.BaseReviewService(base)
-
+	
 	// --------------- Authenticated Routes ----------------
 	auth := router.Group("api/v1")
 	auth.Use(middlewares.RequiredAuth())

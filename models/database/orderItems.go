@@ -13,8 +13,8 @@ type OrderItems struct {
 	Quantity 		int			`gorm:"type:int;not null"`
 	PriceAtOrder 	float64		`gorm:"type:float;not null"`
 	IsActive 		bool		`gorm:"type:boolean;not null"`
-	CreatedBy 		string		`gorm:"type:varchar(255);not null"`
-	UpdatedBy 		string		`gorm:"type:varchar(255);not null"`
-	CreatedAt       time.Time	`gorm:"type:timestamp;not null"`
-	UpdatedAt       time.Time	`gorm:"type:timestamp;not null"`
+	CreatedBy   	string     `gorm:"type:varchar(255);not null; default:'system'"`
+	UpdatedBy   	string     `gorm:"type:varchar(255);not null; default:'system'"`
+	CreatedAt   	time.Time  `gorm:"type:timestamp;not null;default:now()"`
+	UpdatedAt   	time.Time  `gorm:"type:timestamp;not null;default:now()"`
 }

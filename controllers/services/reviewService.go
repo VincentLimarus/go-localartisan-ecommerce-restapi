@@ -73,9 +73,26 @@ func DeleteReview(c *gin.Context){
 	c.JSON(code, output)
 }
 
+func GetReviewByID(c *gin.Context){
+	reviewID := c.Param("id")
+
+	if _, err := uuid.Parse(reviewID); err != nil {
+		output := outputs.BadRequestOutput{
+			Code:    400,
+			Message: fmt.Sprintf("Bad Request: %v", err),
+		}
+		c.JSON(http.StatusBadRequest, output)
+		return
+	}
+	code, output := helpers.GetReviewByID(reviewID)
+	c.JSON(code, output)
+}
+
+
 func BaseReviewService(router *gin.RouterGroup) {
 	router.GET("/reviews", GetAllReviews)
 	router.GET("/reviews/product/:id", GetAllReviewsByProductID)
+	router.GET("/review/:id", GetReviewByID)
 }
 
 func AuthReviewService(router *gin.RouterGroup) {

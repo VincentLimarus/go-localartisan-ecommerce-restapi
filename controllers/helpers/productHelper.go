@@ -386,6 +386,14 @@ func AddProductToCart(AddProductToCartRequestDTO requestsDTO.AddProductToCartReq
 		return 404, output
 	}
 
+	if AddProductToCartRequestDTO.Quantity > product.Quantity {
+		output := outputs.BadRequestOutput{
+			Code: 400,
+			Message: "Bad Request: Product Quantity is not enough",
+		}
+		return 400, output
+	}
+
 	cartInformation := database.CartInformations{
 		CartID:    carts.ID,
 		ProductID:  utils.StringToUUID(AddProductToCartRequestDTO.ID),
@@ -413,8 +421,8 @@ func AddProductToCart(AddProductToCartRequestDTO requestsDTO.AddProductToCartReq
 		output.Code = 200
 		output.Message = "Success: Product Added to Cart"
 
-		var AddProductToCartInformation responsesDTO.CartInformationResponseDTO
-		AddProductToCartInformation, err = repositories.GetCartInformationByCartIDAndProductID(utils.UUIDToString(carts.ID), AddProductToCartRequestDTO.ID)
+		var CartInformations []responsesDTO.CartInformationResponseDTO
+		CartInformations, err = repositories.GetCartInformationByCartIDAndProductID(utils.UUIDToString(carts.ID), AddProductToCartRequestDTO.ID)
 
 		if err != nil {
 			output := outputs.InternalServerErrorOutput{
@@ -431,7 +439,7 @@ func AddProductToCart(AddProductToCartRequestDTO requestsDTO.AddProductToCartReq
 			CreatedAt:   carts.CreatedAt,
 			UpdatedBy:   carts.UpdatedBy,
 			UpdatedAt:   carts.UpdatedAt,	
-			AddProductToCartInformation: AddProductToCartInformation,
+			CartInformations: CartInformations,
 		}
 		return 200, output
 	}
@@ -450,8 +458,8 @@ func AddProductToCart(AddProductToCartRequestDTO requestsDTO.AddProductToCartReq
 	output.Code = 200
 	output.Message = "Success: Product Added to Cart"
 
-	var AddProductToCartInformation responsesDTO.CartInformationResponseDTO
-	AddProductToCartInformation, err = repositories.GetCartInformationByCartIDAndProductID(utils.UUIDToString(carts.ID), AddProductToCartRequestDTO.ID)
+	var CartInformations []responsesDTO.CartInformationResponseDTO
+	CartInformations, err = repositories.GetCartInformationByCartIDAndProductID(utils.UUIDToString(carts.ID), AddProductToCartRequestDTO.ID)
 
 	if err != nil {
 		output := outputs.InternalServerErrorOutput{
@@ -468,8 +476,132 @@ func AddProductToCart(AddProductToCartRequestDTO requestsDTO.AddProductToCartReq
 		CreatedAt:   carts.CreatedAt,
 		UpdatedBy:   carts.UpdatedBy,
 		UpdatedAt:   carts.UpdatedAt,	
-		AddProductToCartInformation: AddProductToCartInformation,
+		CartInformations: CartInformations,
+	}
+	return 200, output
+}
+
+func CheckOutProductRequestDTO(CheckOutProductRequestDTO requestsDTO.CheckOutProductRequestDTO, LoginUser requestsDTO.LoginUserRequestDTO) (int, interface{}) {
+	db := configs.GetDB()
+	var user database.User
+	var order database.Orders
+	var product database.Products
+
+	err := db.Table("users").Where("email = ?", LoginUser.Email).First(&user).Error
+	User_ID := user.ID
+
+	if err != nil {
+		output := outputs.NotFoundOutput{
+			Code: 404,
+			Message: "Not Found: User not exist",
+		}
+		return 404, output
+	}
+
+	err = db.Table("products").Where("id = ?", CheckOutProductRequestDTO.ID).First(&product).Error
+
+	if err != nil{
+		output := outputs.NotFoundOutput{
+			Code: 404,
+			Message: "Not Found: Product not exist",
+		}
+		return 404, output
+	}
+
+	if CheckOutProductRequestDTO.Quantity > product.Quantity {
+		output := outputs.BadRequestOutput{
+			Code: 400,
+			Message: "Bad Request: Product Quantity is not enough",
+		}
+		return 400, output
+	} else {
+		product.Quantity = product.Quantity - CheckOutProductRequestDTO.Quantity
+		err = db.Save(&product).Error
+
+		if err != nil {
+			output := outputs.InternalServerErrorOutput{
+				Code: 500,
+				Message: "Internal Server Error" + err.Error(),
+			}
+			return 500, output
+		}
+	}
+	order = database.Orders{
+		UserID: User_ID,
+		Status: "On-Going",
+		TotalPrice: product.Price * float64(CheckOutProductRequestDTO.Quantity),
+		ShippingAddress: user.Address,
+		PaymentMethod: "Bank Transfer",
+		IsActive: true,
+	}
+
+	err = db.Create(&order).Error
+
+	if err != nil {
+		output := outputs.InternalServerErrorOutput{
+			Code: 500,
+			Message: "Internal Server Error" + err.Error(),
+		}
+		return 500, output
 	}
 	
+
+	orderItem := database.OrderItems{
+		ProductID: product.ID,
+		OrderID: order.ID,
+		Quantity: CheckOutProductRequestDTO.Quantity,
+		PriceAtOrder: product.Price,
+		IsActive: true,
+	}
+	err = db.Create(&orderItem).Error
+
+	if err != nil {
+		output := outputs.InternalServerErrorOutput{
+			Code: 500,
+			Message: "Internal Server Error" + err.Error(),
+		}
+		return 500, output
+	}	
+
+	output := outputs.CheckoutProductOutput{}
+	output.Code = 200
+	output.Message = "Success: Product Checked Out"
+
+	var Item database.OrderItems
+	Item, err = repositories.GetOrderItemByOrderID(utils.UUIDToString(order.ID))
+	
+	if err != nil {
+		output := outputs.InternalServerErrorOutput{
+			Code: 500,
+			Message: "Internal Server Error" + err.Error(),
+		}
+		return 500, output
+	}
+
+	output.Data = responsesDTO.OrderResponseDTO{
+		ID:              order.ID,
+		UserID:          order.UserID,
+		Status:          order.Status,
+		TotalPrice:      order.TotalPrice,
+		ShippingAddress: order.ShippingAddress,
+		PaymentMethod:   order.PaymentMethod,
+		IsActive:        order.IsActive,
+		CreatedBy:       order.CreatedBy,
+		UpdatedBy:       order.UpdatedBy,
+		CreatedAt:       order.CreatedAt,
+		UpdatedAt:       order.UpdatedAt,
+		OrderItems: responsesDTO.OrderItemsResponseDTO{
+			ID:          Item.ID,
+			ProductID:   Item.ProductID,
+			OrderID:     Item.OrderID,
+			Quantity:    Item.Quantity,
+			PriceAtOrder: Item.PriceAtOrder,
+			IsActive:    Item.IsActive,
+			CreatedBy:   Item.CreatedBy,
+			UpdatedBy:   Item.UpdatedBy,
+			CreatedAt:   Item.CreatedAt,
+			UpdatedAt:   Item.UpdatedAt,
+		},
+	}
 	return 200, output
 }

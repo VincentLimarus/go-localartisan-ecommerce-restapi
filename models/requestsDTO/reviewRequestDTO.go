@@ -10,6 +10,7 @@ type GetAllReviewsRequestDTO struct {
 }
 
 type GetAllReviewsByProductIDRequestDTO struct {
+	ID 	  	  string 	`json:"id" form:"id" binding:"required"`
 	ProductID uuid.UUID `json:"product_id" form:"product_id" binding:"required"`
 	Page      int    	`json:"page" form:"page" binding:"omitempty"`
 	Limit     int    	`json:"limit" form:"limit" binding:"omitempty"`
@@ -32,5 +33,4 @@ type CreateReviewRequestDTO struct {
 
 type DeleteReviewRequestDTO struct {
 	ID              string `json:"id" form:"id" binding:"required"`
-	UserID 			uuid.UUID `json:"user_id" form:"user_id" binding:"required"`
 }

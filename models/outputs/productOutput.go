@@ -43,7 +43,7 @@ type AddProductToCartOutput struct {
 	Data responsesDTO.CartResponseDTO `json:"data"`
 }
 
-type CheckOutProductRequestDTO struct {
+type CheckoutProductOutput struct {
 	BaseOutput
-	Data responsesDTO.CartResponseDTO `json:"data"`
+	Data responsesDTO.OrderResponseDTO `json:"data"`
 }

@@ -19,5 +19,5 @@ type OrderResponseDTO struct {
 	CreatedAt       time.Time               `json:"created_at"`
 	UpdatedAt       time.Time               `json:"updated_at"`
 
-	OrderItems      []OrderItemsResponseDTO `json:"order_items"`
+	OrderItems      OrderItemsResponseDTO `json:"order_items"` 
 }
