@@ -39,7 +39,7 @@ So This Repository is going to answer the challenges by doing backend and databa
 ---------------
 **Server**: Go, Gin-Gonic, GORM, PostgreSQL, Docker
 
-**Helper Stack**: tablePlus, pgAdmin, Postman, Visual Studio Code, Git (bash, etc)
+**Helper Stack**: tablePlus, pgAdmin, Postman, Visual Studio Code, DrawSQL, Git (bash, etc)
 
 **Static Documentation**
 ---
@@ -72,11 +72,11 @@ TIMEOUT="3s"
 ---
 Clone this repository into ur Local
 ```
-git clone https://github.com/VincentLimarus/E-Commerce-LocalArtisans.git
+git clone https://github.com/VincentLimarus/LocalArtisan-RestAPI.git
 ```
 Go to the Directory
 ```
-cd E-Commerce-LocalArtisans
+cd LocalArtisan-RestAPI
 ```
 Install Dependency
 ```
