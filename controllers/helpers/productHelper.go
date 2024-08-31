@@ -528,7 +528,7 @@ func CheckOutProductRequestDTO(CheckOutProductRequestDTO requestsDTO.CheckOutPro
 	}
 	order = database.Orders{
 		UserID: User_ID,
-		Status: "On-Going",
+		Status: "Waiting for Payment",
 		TotalPrice: product.Price * float64(CheckOutProductRequestDTO.Quantity),
 		ShippingAddress: user.Address,
 		PaymentMethod: "Bank Transfer",
@@ -567,13 +567,13 @@ func CheckOutProductRequestDTO(CheckOutProductRequestDTO requestsDTO.CheckOutPro
 	output.Code = 200
 	output.Message = "Success: Product Checked Out"
 
-	var Item database.OrderItems
-	Item, err = repositories.GetOrderItemByOrderID(utils.UUIDToString(order.ID))
-	
+	var orderItems []responsesDTO.OrderItemsResponseDTO
+	orderItems, err = repositories.GetAllOrderItemsByOrderID(order.ID.String())
+
 	if err != nil {
 		output := outputs.InternalServerErrorOutput{
-			Code: 500,
-			Message: "Internal Server Error" + err.Error(),
+			Code : 500,
+			Message : "Internal Server Error",
 		}
 		return 500, output
 	}
@@ -590,18 +590,7 @@ func CheckOutProductRequestDTO(CheckOutProductRequestDTO requestsDTO.CheckOutPro
 		UpdatedBy:       order.UpdatedBy,
 		CreatedAt:       order.CreatedAt,
 		UpdatedAt:       order.UpdatedAt,
-		OrderItems: responsesDTO.OrderItemsResponseDTO{
-			ID:          Item.ID,
-			ProductID:   Item.ProductID,
-			OrderID:     Item.OrderID,
-			Quantity:    Item.Quantity,
-			PriceAtOrder: Item.PriceAtOrder,
-			IsActive:    Item.IsActive,
-			CreatedBy:   Item.CreatedBy,
-			UpdatedBy:   Item.UpdatedBy,
-			CreatedAt:   Item.CreatedAt,
-			UpdatedAt:   Item.UpdatedAt,
-		},
+		OrderItems: 	 orderItems,
 	}
 	return 200, output
 }

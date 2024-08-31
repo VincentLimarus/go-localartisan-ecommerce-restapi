@@ -13,7 +13,7 @@ type GetAllOrderByUserIDOutput struct {
 	Data []responsesDTO.OrderResponseDTO `json:"data"`
 }
 
-type GetOrderOutput struct {
+type GetOrderOutputByOrderIDOutput struct {
 	BaseOutput
 	Data responsesDTO.OrderResponseDTO `json:"data"`
 }
@@ -28,7 +28,7 @@ type DeleteOrderOutput struct {
 	Data responsesDTO.OrderResponseDTO `json:"data"`
 }
 
-type CheckOutOrderOutput struct {
+type PayOrderOutput struct {
 	BaseOutput
 	Data responsesDTO.OrderResponseDTO `json:"data"`
 }

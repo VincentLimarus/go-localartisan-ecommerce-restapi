@@ -19,5 +19,5 @@ type Orders struct {
 	CreatedAt  	    time.Time  `gorm:"type:timestamp;not null;default:now()"`
 	UpdatedAt   	time.Time  `gorm:"type:timestamp;not null;default:now()"`
 
-	OrderItems 		[]OrderItems 	`gorm:"foreignKey:OrderID;references:ID"`
+	OrderItems 		[]OrderItems 	`gorm:"foreignKey:OrderID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 }

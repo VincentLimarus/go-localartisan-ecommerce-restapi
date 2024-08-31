@@ -291,3 +291,107 @@ func DeleteCart(DeleteCartRequestDTO requestsDTO.DeleteCartRequestDTO) (int, int
 	}
 	return 200, output
 }
+
+func CheckoutProductFromCart(CheckoutProductFromCartRequestDTO requestsDTO.CheckoutProductFromCartRequestDTO, LoginUser requestsDTO.LoginUserRequestDTO) (int, interface{}){
+	db := configs.GetDB()	
+	var cartInformations []database.CartInformations
+	var order database.Orders
+	var user database.User
+	var orderItems []database.OrderItems
+
+	err := db.Table("cart_informations").Where("cart_id = ?", CheckoutProductFromCartRequestDTO.ID).Find(&cartInformations).Error
+
+	if err != nil {
+		output := outputs.NotFoundOutput{
+			Code: 404,
+			Message: "Not Found: Cart Information not exist",
+		}
+		return 404, output
+	}
+	
+	for _, cartInformation := range cartInformations {
+		order.TotalPrice = order.TotalPrice + (cartInformation.PriceAtOrder * float64(cartInformation.Quantity))
+	}
+
+	err = db.Table("users").Where("email = ?", LoginUser.Email).First(&user).Error
+	User_ID := user.ID
+
+	if err == nil {
+		order = database.Orders{
+			UserID: User_ID,
+			Status: "Waiting for Payment",
+			TotalPrice: order.TotalPrice,
+			ShippingAddress: user.Address,
+			PaymentMethod: "Bank Transfer",
+			IsActive: true,
+		}
+		err = db.Create(&order).Error
+	}
+
+	if err != nil {
+		output := outputs.InternalServerErrorOutput{
+			Code: 500,
+			Message: "Internal Server Error" + err.Error(),
+		}
+		return 500, output
+	}
+
+	for _, cartInformation := range cartInformations {
+		orderItem := database.OrderItems{
+			OrderID: order.ID,
+			ProductID: cartInformation.ProductID,
+			Quantity: cartInformation.Quantity,
+			PriceAtOrder: cartInformation.PriceAtOrder,
+			IsActive: true,
+		}
+		orderItems = append(orderItems, orderItem)
+	}
+
+	err = db.Create(&orderItems).Error
+
+	if err != nil {
+		output := outputs.InternalServerErrorOutput{
+			Code: 500,
+			Message: "Internal Server Error" + err.Error(),
+		}
+		return 500, output
+	}
+
+	output := outputs.CheckoutProductFromCartOutputDTO{}
+	output.Code = 200
+	output.Message = "Success: Product Checked Out from Cart"
+
+	var cartsItems []responsesDTO.CartInformationResponseDTO
+	cartsItems, err = repositories.GetAllCartInformationsByCartID(CheckoutProductFromCartRequestDTO.ID)
+	
+	if err != nil {
+		output := outputs.InternalServerErrorOutput{
+			Code:    500,
+			Message: "Internal Server Error {Error GetAllCartInformationsByCartID}: " + err.Error(),
+		}
+		return 500, output
+	}
+
+	output.Data = responsesDTO.CartResponseDTO{
+		ID: order.ID,
+		UserID: order.UserID,
+		IsActive: order.IsActive,
+		CreatedBy: order.CreatedBy,
+		UpdatedBy: order.UpdatedBy,
+		CreatedAt: order.CreatedAt,
+		UpdatedAt: order.UpdatedAt,
+		CartInformations: cartsItems,
+	}
+
+	err = db.Table("carts").Where("id = ?", CheckoutProductFromCartRequestDTO.ID).Delete(&database.Carts{}).Error
+
+	if err != nil {
+		output := outputs.InternalServerErrorOutput{
+			Code: 500,
+			Message: "Internal Server Error" + err.Error(),
+		}
+		return 500, output
+	}
+
+	return 200, output
+}

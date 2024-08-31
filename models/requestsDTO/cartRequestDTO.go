@@ -27,6 +27,6 @@ type DeleteCartRequestDTO struct {
 	ID string `json:"id" form:"id" binding:"required"`
 }
 
-type OrderNowRequestDTO struct {
+type CheckoutProductFromCartRequestDTO struct {
 	ID string `json:"id" form:"id" binding:"required"`
 }

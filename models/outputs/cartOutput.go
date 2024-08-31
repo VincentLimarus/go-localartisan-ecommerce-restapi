@@ -27,3 +27,8 @@ type DeleteCartOutputDTO struct {
 	BaseOutput
 	Data responsesDTO.CartResponseDTO `json:"data"`
 }
+
+type CheckoutProductFromCartOutputDTO struct {
+	BaseOutput
+	Data responsesDTO.CartResponseDTO `json:"data"`
+}

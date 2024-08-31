@@ -184,8 +184,8 @@ func CheckoutProduct(c *gin.Context) {
 	// Panggil fungsi helper dengan data yang telah di-bind dan LoginUser
 	code, output := helpers.CheckOutProductRequestDTO(CheckoutProduct, LoginUser)
 	c.JSON(code, output)
-
 }
+
 func BaseProductService(router *gin.RouterGroup) {
 	router.GET("/products", GetAllProduct)
 	router.GET("/products/artisan/:id", GetAllProductByArtisanID)

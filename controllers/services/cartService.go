@@ -86,10 +86,46 @@ func DeleteCart(c *gin.Context){
 	c.JSON(code, output)
 }
 
+func CheckoutProductFromCart(c *gin.Context) {
+	var CheckoutProductFromCart requestsDTO.CheckoutProductFromCartRequestDTO
+
+	// Bind JSON body ke CheckoutProductRequestDTO
+	if err := c.ShouldBindJSON(&CheckoutProductFromCart); err != nil {
+		output := outputs.BadRequestOutput{
+			Code:    400,
+			Message: fmt.Sprintf("Bad Request: %v", err),
+		}
+		c.JSON(http.StatusBadRequest, output)
+		return
+	}
+
+	// Ambil email dari context
+	email, exists := c.Get("user_email")
+	if !exists {
+		output := outputs.UnauthorizedOutput{
+			Code:    401,
+			Message: "Unauthorized: User email not found in context",
+		}
+		c.JSON(http.StatusUnauthorized, output)
+		return
+	}
+
+	// Buat LoginUserRequestDTO dengan email yang diambil dari context
+	LoginUser := requestsDTO.LoginUserRequestDTO{
+		Email: email.(string),
+	}
+
+	// Panggil fungsi helper dengan data yang telah di-bind dan LoginUser
+	code, output := helpers.CheckoutProductFromCart(CheckoutProductFromCart, LoginUser)
+	c.JSON(code, output)
+
+}
+
 func AuthCartService(router *gin.RouterGroup) {
 	router.GET("/carts", GetAllCarts)
 	router.GET("/carts/user/:id", GetAllCartByUserID)
 	router.GET("/cart/:id", GetCartByID)
 	router.POST("/cart/create", CreateCart)
 	router.POST("/cart/delete", DeleteCart)
+	router.POST("/cart/checkout", CheckoutProductFromCart)
 }

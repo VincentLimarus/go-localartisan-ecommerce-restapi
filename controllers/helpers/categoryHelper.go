@@ -260,7 +260,6 @@ func DeleteCategory(DeleteCategoryRequestDTO requestsDTO.DeleteCategoryRequestDT
 		}
 	}
 
-
 	err = db.Table("categories").Where("id = ?", DeleteCategoryRequestDTO.ID).First(&category).Error
 	if err != nil {
 		output := outputs.NotFoundOutput{

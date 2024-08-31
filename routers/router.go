@@ -51,6 +51,7 @@ func RoutersConfiguration() *gin.Engine{
 	services.AuthReviewService(auth)
 	services.AuthCartService(auth)
 	services.AuthCartInformationService(auth)
+	services.AuthOrderService(auth)
 
 	return router
 }
