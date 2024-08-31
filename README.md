@@ -1,4 +1,4 @@
-**Local Artisan - Simple E-Commerce**
+**Local Artisan - Rest API E-Commerce**
 --------------------------------
 Indonesian artisans struggle to expand their market and showcase their craftsmanship beyond local communities. A platform is needed to help them display products, sell online, and promote Indonesia's cultural heritage.
 So This Repository is going to answer the challenges by doing backend and database development. I'll use Golang with Gin and GORM alongside PostgreSQL for efficient data management. This approach ensures the E-commerce Platform for Local Artisans tackles the practical issues faced by Indonesian artisans while also preserving and promoting Indonesia’s cultural heritage digitally.
