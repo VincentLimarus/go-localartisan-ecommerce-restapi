@@ -17,7 +17,7 @@ So This Repository is going to answer the challenges by doing backend and databa
 
 - **Checkout Product**: Enables users to purchase a single product in one order, using the "Buy Now" feature.
 
-- **Checkout Products** in Cart: Allows users to checkout multiple products they have added to their cart.
+- **Checkout Products in Cart**: Allows users to checkout multiple products they have added to their cart.
 
 **Key Takeaways**
 ---
@@ -67,7 +67,6 @@ DB_NAME = database_name
 JWT_SECRET_KEY="UR_SECRET_KEY"
 
 TIMEOUT="3s"
-
 ```
 **Pull / Download in ur Local**
 ---
