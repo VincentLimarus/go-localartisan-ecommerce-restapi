@@ -58,6 +58,20 @@ func GetAllOrderByUserID(c *gin.Context) {
 	c.JSON(code, output)
 }
 
+func GetAllOrderByUserIDAndStatus(c *gin.Context) {
+	var GetAllOrderByUserIDAndStatusRequestDTO requestsDTO.GetAllOrderByUserIDAndStatusRequestDTO
+	if err := c.ShouldBindJSON(&GetAllOrderByUserIDAndStatusRequestDTO); err != nil {
+		output := outputs.BadRequestOutput{
+			Code:    400,
+			Message: fmt.Sprintf("Bad Request: %v", err),
+		}
+		c.JSON(http.StatusBadRequest, output)
+		return
+	}
+	code, output := helpers.GetAllOrderByUserIDAndStatus(GetAllOrderByUserIDAndStatusRequestDTO)
+	c.JSON(code, output)
+}
+
 func DeleteOrder(c *gin.Context) {
 	var DeleteOrderRequestDTO requestsDTO.DeleteOrderRequestDTO
 	if err := c.ShouldBindJSON(&DeleteOrderRequestDTO); err != nil {
@@ -86,10 +100,26 @@ func PayOrder(c *gin.Context) {
 	c.JSON(code, output)
 }
 
+func FinishOrder(c *gin.Context) {
+	var FinishOrderRequestDTO requestsDTO.FinishOrderRequestDTO
+	if err := c.ShouldBindJSON(&FinishOrderRequestDTO); err != nil {
+		output := outputs.BadRequestOutput{
+			Code:    400,
+			Message: fmt.Sprintf("Bad Request: %v", err),
+		}
+		c.JSON(http.StatusBadRequest, output)
+		return
+	}
+	code, output := helpers.FinishOrder(FinishOrderRequestDTO)
+	c.JSON(code, output)
+}
+
 func AuthOrderService(router *gin.RouterGroup) {
 	router.GET("/orders", GetAllOrder)
 	router.GET("/order/:id", GetOrderByOrderID)
 	router.GET("/orders/user/:id", GetAllOrderByUserID)
 	router.POST("/order/delete", DeleteOrder)
 	router.POST("/order/pay", PayOrder)
+	router.POST("/order/finish", FinishOrder)
+	router.POST("/orders/user/status", GetAllOrderByUserIDAndStatus)
 }

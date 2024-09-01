@@ -332,3 +332,121 @@ func PayOrder(PayOrderRequestDTO requestsDTO.PayOrderRequestDTO) (int, interface
 	}
 	return 200, output
 }
+
+func GetAllOrderByUserIDAndStatus(GetAllOrderByUserIDAndStatusRequestDTO requestsDTO.GetAllOrderByUserIDAndStatusRequestDTO) (int, interface{}) {
+	var orders []database.Orders
+	orders, err := repositories.GetAllOrderByUserIDAndStatus(GetAllOrderByUserIDAndStatusRequestDTO.UserID, GetAllOrderByUserIDAndStatusRequestDTO.Status)
+
+	if err != nil {
+		output := outputs.InternalServerErrorOutput{
+			Code : 500,
+			Message : "Internal Server Error",
+		}
+		return 500, output
+	}
+
+	if len(orders) == 0 {
+		output := outputs.NotFoundOutput{
+			Code : 404,
+			Message : "Not Found",
+		}
+		return 404, output
+	}
+
+	output := outputs.GetAllOrderByUserIDAndStatusOutput{}
+	output.Code = 200
+	output.Message = "Success"
+	
+	for _, order := range orders{
+		var orderItems []responsesDTO.OrderItemsResponseDTO
+		orderItems, err := repositories.GetAllOrderItemsByOrderID(order.ID.String())
+
+		if err != nil {
+			output := outputs.InternalServerErrorOutput{
+				Code : 500,
+				Message : "Internal Server Error",
+			}
+			return 500, output
+		}
+
+		output.Data = append(output.Data, responsesDTO.OrderResponseDTO{
+			ID : order.ID,
+			UserID : order.UserID,
+			Status : order.Status,
+			TotalPrice : order.TotalPrice,
+			ShippingAddress : order.ShippingAddress,
+			PaymentMethod : order.PaymentMethod,
+			IsActive : order.IsActive,
+			CreatedBy : order.CreatedBy,
+			UpdatedBy : order.UpdatedBy,
+			CreatedAt : order.CreatedAt,
+			UpdatedAt : order.UpdatedAt,
+			OrderItems : orderItems,
+		})
+	}
+	return 200, output
+}
+
+func FinishOrder(FinishOrderRequestDTO requestsDTO.FinishOrderRequestDTO) (int, interface{}) {
+	db := configs.GetDB()
+	var order database.Orders
+
+	err := db.Table("orders").Where("id = ?", FinishOrderRequestDTO.ID).First(&order).Error
+
+	if err != nil {
+		output := outputs.InternalServerErrorOutput{
+			Code : 500,
+			Message : "Internal Server Error",
+		}
+		return 500, output
+	}	
+
+	if len(order.ID) == 0 {
+		output := outputs.NotFoundOutput{
+			Code : 404,
+			Message : "Not Found",
+		}
+		return 404, output
+	}
+
+	order.Status = "Order Finished"
+	err = db.Save(&order).Error
+
+	if err != nil {
+		output := outputs.InternalServerErrorOutput{
+			Code : 500,
+			Message : "Internal Server Error",
+		}
+		return 500, output
+	}
+
+	var orderItems []responsesDTO.OrderItemsResponseDTO
+	orderItems, err = repositories.GetAllOrderItemsByOrderID(order.ID.String())
+
+	if err != nil {
+		output := outputs.InternalServerErrorOutput{
+			Code : 500,
+			Message : "Internal Server Error",
+		}
+		return 500, output
+	}
+
+	output := outputs.FinishOrderOutput{}
+	output.Code = 200
+	output.Message = "Success"
+	output.Data = responsesDTO.OrderResponseDTO{
+		ID : order.ID,
+		UserID : order.UserID,
+		Status : order.Status,
+		TotalPrice : order.TotalPrice,
+		ShippingAddress : order.ShippingAddress,
+		PaymentMethod : order.PaymentMethod,
+		IsActive : order.IsActive,
+		CreatedBy : order.CreatedBy,
+		UpdatedBy : order.UpdatedBy,
+		CreatedAt : order.CreatedAt,	
+		UpdatedAt : order.UpdatedAt,
+		OrderItems : orderItems,
+	}
+	return 200, output
+}

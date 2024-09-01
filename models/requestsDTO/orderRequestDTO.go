@@ -17,6 +17,11 @@ type GetAllOrderByUserIDRequestDTO struct {
 	UserID uuid.UUID `json:"user_id" form:"user_id" binding:"required"`
 }
 
+type GetAllOrderByUserIDAndStatusRequestDTO struct {
+	UserID uuid.UUID `json:"user_id" form:"user_id" binding:"required"`
+	Status string `json:"status" form:"status" binding:"required"`
+}
+
 type CreateOrderRequestDTO struct {
 	UserID          uuid.UUID `json:"user_id" form:"user_id" binding:"required"`
 	Status          string    `json:"status" form:"status" binding:"required"`
@@ -35,4 +40,8 @@ type PayOrderRequestDTO struct {
 	ID string `json:"id" form:"id" binding:"required"`
 	PaymentMethod string `json:"payment_method" form:"payment_method" binding:"omitempty"` // kalo mau ganti payment bisa. kalo ga diisi, defaultnya tetep payment method yang lama
 	ConfirmOrder bool `json:"confirm_order" form:"confirm_order" binding:"required"`		
+}
+
+type FinishOrderRequestDTO struct {
+	ID string `json:"id" form:"id" binding:"required"`
 }
