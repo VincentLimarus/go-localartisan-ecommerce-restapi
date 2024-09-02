@@ -188,12 +188,8 @@ func UpdateItemInCart(UpdateItemInCart requestsDTO.UpdateItemInCartRequestDTO) (
 		return 404, output
 	}
 
-	if UpdateItemInCart.Quantity != 0 {
-		cartInformation.Quantity = UpdateItemInCart.Quantity
-	} else {
-		cartInformation.Quantity = UpdateItemInCart.Quantity
-	}
-
+	cartInformation.Quantity = UpdateItemInCart.Quantity
+	
 	if UpdateItemInCart.UpdatedBy == "" {
 		cartInformation.UpdatedBy = "user"
 	} else{

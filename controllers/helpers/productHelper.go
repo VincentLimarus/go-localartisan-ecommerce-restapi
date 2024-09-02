@@ -233,8 +233,6 @@ func UpdateProduct(UpdateProductRequestDTO requestsDTO.UpdateProductRequestDTO) 
 	// Not NULL Update constraint -> ini tidak boleh null, kalo user tidak mengisi maka akan diisi oleh sistem
 	if UpdateProductRequestDTO.Name != "" {
 		product.Name = UpdateProductRequestDTO.Name
-	} else{
-		product.Name = UpdateProductRequestDTO.Name
 	}
 
 	if UpdateProductRequestDTO.UpdatedBy == "" {
@@ -245,22 +243,14 @@ func UpdateProduct(UpdateProductRequestDTO requestsDTO.UpdateProductRequestDTO) 
 
 	if UpdateProductRequestDTO.Price != 0 {
 		product.Price = UpdateProductRequestDTO.Price
-	} else {
-		product.Price = UpdateProductRequestDTO.Price
 	}
 
 	if UpdateProductRequestDTO.Description != "" {
 		product.Description = UpdateProductRequestDTO.Description
-	} else{
-		product.Description = UpdateProductRequestDTO.Description
-	}
+	} 
 
-	if UpdateProductRequestDTO.Quantity != 0 {
-		product.Quantity = UpdateProductRequestDTO.Quantity
-	} else {
-		product.Quantity = UpdateProductRequestDTO.Quantity
-	}
-
+	product.Quantity = UpdateProductRequestDTO.Quantity
+	
 	// Boolean Update Constraint
 	product.IsActive = UpdateProductRequestDTO.IsActive
 

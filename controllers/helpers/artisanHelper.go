@@ -248,18 +248,14 @@ func UpdateArtisan(UpdateArtisanRequestDTO requestsDTO.UpdateArtisanRequestDTO) 
 	// Not NULL Update constraint -> ini tidak boleh null, kalo user tidak mengisi maka akan diisi oleh sistem
 	if UpdateArtisanRequestDTO.ShopName != ""{
 		artisan.ShopName = UpdateArtisanRequestDTO.ShopName
-	} else {
-		artisan.ShopName = UpdateArtisanRequestDTO.ShopName
-	}
+	} 
+
 	if UpdateArtisanRequestDTO.ShopAddress != ""{
 		artisan.ShopAddress = UpdateArtisanRequestDTO.ShopAddress
-	} else {
-		artisan.ShopAddress = UpdateArtisanRequestDTO.ShopAddress
-	}
+	} 
+
 	if UpdateArtisanRequestDTO.UpdatedBy == ""{
 		artisan.UpdatedBy = "user"
-	}else{
-		artisan.UpdatedBy = UpdateArtisanRequestDTO.UpdatedBy
 	}
 
 	artisan.Description = UpdateArtisanRequestDTO.Description

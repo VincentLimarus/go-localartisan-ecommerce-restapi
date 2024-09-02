@@ -180,16 +180,11 @@ func UpdateCategory(UpdateCategoryRequestDTO requestsDTO.UpdateCategoryRequestDT
 	// Not NULL Update constraint -> ini tidak boleh null, kalo user tidak mengisi maka akan diisi oleh sistem
 	if UpdateCategoryRequestDTO.Name != "" {
 		category.Name = UpdateCategoryRequestDTO.Name
-	} else {
-		category.Name = UpdateCategoryRequestDTO.Name
 	}
 
 	if UpdateCategoryRequestDTO.Image != "" {
 		category.Image = UpdateCategoryRequestDTO.Image
-	} else {
-		category.Image = UpdateCategoryRequestDTO.Image
-	}
-	
+	} 
 	if UpdateCategoryRequestDTO.UpdatedBy == "" {
 		category.UpdatedBy = "user"
 	} else{

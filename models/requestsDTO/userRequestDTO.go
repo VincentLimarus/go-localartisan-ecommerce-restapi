@@ -14,6 +14,8 @@ type GetUserRequestDTO struct {
 type RegisterUserRequestDTO struct {
 	Name            string `json:"name" form:"name" binding:"required"`
 	Email           string `json:"email" form:"email" binding:"required"`
+	Address         string `json:"address" form:"address" binding:"omitempty"`
+	PhoneNumber     string `json:"phone_number" form:"phone_number" binding:"omitempty"`
 	Password        string `json:"password" form:"password" binding:"required"`
 	ConfirmPassword string `json:"confirm_password" form:"confirm_password" binding:"required"`
 	IsActive        bool   `json:"is_active" form:"is_active" binding:"required"`

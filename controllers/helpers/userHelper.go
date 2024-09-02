@@ -155,14 +155,6 @@ func RegisterUser(RegisterUserRequestDTO requestsDTO.RegisterUserRequestDTO) (in
 
 	db := configs.GetDB()
 
-	if db == nil{
-		output := outputs.InternalServerErrorOutput{
-			Code: 500,
-			Message: "Internal Server Error: Database connection failed",
-		}
-		return 500, output
-	}
-
 	user := database.User{
 		Name: RegisterUserRequestDTO.Name,
 		Email: RegisterUserRequestDTO.Email,
@@ -216,7 +208,7 @@ func LoginUser(LoginUserRequestDTO requestsDTO.LoginUserRequestDTO) (int, interf
 	if !utils.ComparePassword(user.Password, LoginUserRequestDTO.Password) {
 		output := outputs.BadRequestOutput{
 			Code:    400,
-			Message: "Bad Request: Password is incorrect",
+			Message: "Bad Request: Password or Email is incorrect",
 		}
 		return 400, output, "Token not found"
 	}
@@ -279,21 +271,15 @@ func UpdateUser(UpdateUserRequestDTO requestsDTO.UpdateUserRequestDTO) (int, int
 	// Not NULL Update constraint -> ini tidak boleh null, kalo user tidak mengisi maka akan diisi oleh sistem
 	if UpdateUserRequestDTO.Name != "" {
 		user.Name = UpdateUserRequestDTO.Name
-	} else {
-		user.Name = UpdateUserRequestDTO.Name
 	}
 
 	if UpdateUserRequestDTO.Email != "" {
 		user.Email = UpdateUserRequestDTO.Email
-	} else {
-		user.Email = UpdateUserRequestDTO.Email
-	}
+	} 
 	
 	if UpdateUserRequestDTO.UpdatedBy == "" {
 		user.UpdatedBy = "User"
-	} else {
-		user.UpdatedBy = UpdateUserRequestDTO.UpdatedBy
-	}
+	} 
 
 	// Nullable Update Constraint
 	user.PhoneNumber = UpdateUserRequestDTO.PhoneNumber	
@@ -332,27 +318,8 @@ func UpdateUser(UpdateUserRequestDTO requestsDTO.UpdateUserRequestDTO) (int, int
 func DeleteUser(DeleteUserRequestDTO requestsDTO.DeleteUserRequestDTO) (int, interface{}) {
 	db := configs.GetDB()
 	var user database.User
-	var artisan database.Artisans
 	
-	err := db.Table("artisans").Where("user_id = ?", utils.StringToUUID(DeleteUserRequestDTO.ID)).First(&artisan).Error
-
-	if err != nil {
-		output := outputs.InternalServerErrorOutput{
-			Code: 500,
-			Message: fmt.Sprintf("Internal Server Error: %v", err),
-		}
-		return 500, output
-	}
-
-	if err := db.Delete(&artisan).Error; err != nil {
-		output := outputs.InternalServerErrorOutput{
-			Code: 500,
-			Message: fmt.Sprintf("Internal Server Error: %v", err),
-		}
-		return 500, output
-	}
-	
-	err = db.Where("id = ?", utils.StringToUUID(DeleteUserRequestDTO.ID)).First(&user).Error
+	err := db.Where("id = ?", utils.StringToUUID(DeleteUserRequestDTO.ID)).First(&user).Error
 
 	if err != nil {
 		output := outputs.InternalServerErrorOutput{
@@ -378,15 +345,6 @@ func DeleteUser(DeleteUserRequestDTO requestsDTO.DeleteUserRequestDTO) (int, int
 		return 400, output
 	}
 
-
-	if err := db.Delete(&user).Error; err != nil {
-		output := outputs.InternalServerErrorOutput{
-			Code: 500,
-			Message: fmt.Sprintf("Internal Server Error: %v", err),
-		}
-		return 500, output
-	}
-
 	output := outputs.DeleteUserOutput{}
 	output.Code = 200
 	output.Message = "Success: User deleted"
@@ -402,6 +360,14 @@ func DeleteUser(DeleteUserRequestDTO requestsDTO.DeleteUserRequestDTO) (int, int
 		UpdatedBy: user.UpdatedBy,
 		CreatedAt: user.CreatedAt,
 		UpdatedAt: user.UpdatedAt,
+	}
+	
+	if err := db.Delete(&user).Error; err != nil {
+		output := outputs.InternalServerErrorOutput{
+			Code: 500,
+			Message: fmt.Sprintf("Internal Server Error: %v", err),
+		}
+		return 500, output
 	}
 
 	return 200, output
@@ -472,5 +438,6 @@ func ChangePasswordUser(ChangePasswordUserRequestDTO requestsDTO.ChangePasswordR
 	output := outputs.ChangePasswordOutput{}
 	output.Code = 200
 	output.Message = "Success: Password changed"
+
 	return 200, output
 }
