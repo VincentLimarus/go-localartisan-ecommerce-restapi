@@ -52,17 +52,17 @@ Entity Relationship Diagram: https://drawsql.app/teams/sen-2/diagrams/e-commerce
 **Env Files**
 ---
 ```
-APP_NAME = Local Artisans
+APP_NAME = "LocalArtisans"
 
-DB_HOST = localArtisan
+DB_HOST = "localArtisans"
 
-DB_PORT = 5432
+DB_PORT = "5432"
 
-DB_USER = postgres
+DB_USER = "postgres"
 
-DB_PASSWORD = database_password
+DB_PASSWORD = "database_password"
 
-DB_NAME = database_name
+DB_NAME = "database_name"
 
 JWT_SECRET_KEY="UR_SECRET_KEY"
 
