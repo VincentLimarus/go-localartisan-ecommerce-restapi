@@ -5,7 +5,7 @@ So This Repository is going to answer the challenges by doing backend and databa
 
 **Main Features**
 ---
-- **CRUD Operations**: Enables users to perform Create, Read, Update, and Delete actions on the platform (nearly all features support these operations).
+- **CRUD Operations**: Allows users and artisans to perform Create, Read, Update, and Delete actions on the platform. Nearly all features support these operations; for example, artisans can create or add their items to the platform, and they can also update or delete them as needed.
 
 - **User Registration**: Allows users to create an account on the platform.
 
