@@ -302,6 +302,41 @@ func PayOrder(PayOrderRequestDTO requestsDTO.PayOrderRequestDTO) (int, interface
 		return 500, output
 	}
 
+	var items []database.OrderItems
+	err = db.Table("order_items").Where("order_id = ?", PayOrderRequestDTO.ID).Find(&items).Error
+
+	if err != nil {
+		output := outputs.InternalServerErrorOutput{
+			Code : 500,
+			Message : "Internal Server Error",
+		}
+		return 500, output
+	}
+
+	for _, item := range items {
+		var product database.Products
+		err = db.Table("products").Where("id = ?", item.ProductID).First(&product).Error
+
+		if err != nil {
+			output := outputs.InternalServerErrorOutput{
+				Code : 500,
+				Message : "Internal Server Error",
+			}
+			return 500, output
+		}
+
+		product.Quantity = product.Quantity - item.Quantity
+		err = db.Save(&product).Error
+
+		if err != nil {
+			output := outputs.InternalServerErrorOutput{
+				Code : 500,
+				Message : "Internal Server Error",
+			}
+			return 500, output
+		}
+	}
+
 	var orderItems []responsesDTO.OrderItemsResponseDTO
 	orderItems, err = repositories.GetAllOrderItemsByOrderID(order.ID.String())
 
@@ -445,6 +480,106 @@ func FinishOrder(FinishOrderRequestDTO requestsDTO.FinishOrderRequestDTO) (int, 
 		CreatedBy : order.CreatedBy,
 		UpdatedBy : order.UpdatedBy,
 		CreatedAt : order.CreatedAt,	
+		UpdatedAt : order.UpdatedAt,
+		OrderItems : orderItems,
+	}
+	return 200, output
+}
+
+func CancelOrder(CancelOrderRequestDTO requestsDTO.CancelOrderRequestDTO) (int, interface{}){
+	db := configs.GetDB()
+	var order database.Orders
+
+	err := db.Table("orders").Where("id = ?", CancelOrderRequestDTO.ID).First(&order).Error
+
+	if err != nil {
+		output := outputs.InternalServerErrorOutput{
+			Code : 500,
+			Message : "Internal Server Error",
+		}
+		return 500, output
+	}
+
+	if len(order.ID) == 0 {
+		output := outputs.NotFoundOutput{
+			Code : 404,
+			Message : "Not Found",
+		}
+		return 404, output
+	}
+
+	order.Status = "Order Cancelled"
+	err = db.Save(&order).Error
+	
+	if err != nil {
+		output := outputs.InternalServerErrorOutput{
+			Code : 500,
+			Message : "Internal Server Error",
+		}
+		return 500, output
+	}
+
+	// Quantity tambahin lagi ke product
+	var items []database.OrderItems
+	err = db.Table("order_items").Where("order_id = ?", CancelOrderRequestDTO.ID).Find(&items).Error
+
+	if err != nil {
+		output := outputs.InternalServerErrorOutput{
+			Code : 500,
+			Message : "Internal Server Error",
+		}
+		return 500, output
+	}
+
+	for _, item := range items {
+		var product database.Products
+		err = db.Table("products").Where("id = ?", item.ProductID).First(&product).Error
+		
+		if err != nil {
+			output := outputs.InternalServerErrorOutput{
+				Code : 500,
+				Message : "Internal Server Error",
+			}
+			return 500, output
+		}
+
+		product.Quantity = product.Quantity + item.Quantity
+		err = db.Save(&product).Error
+
+		if err != nil {
+			output := outputs.InternalServerErrorOutput{
+				Code : 500,
+				Message : "Internal Server Error",
+			}
+			return 500, output
+		}
+	}
+	
+	var orderItems []responsesDTO.OrderItemsResponseDTO
+	orderItems, err = repositories.GetAllOrderItemsByOrderID(order.ID.String())
+
+	if err != nil {
+		output := outputs.InternalServerErrorOutput{
+			Code : 500,
+			Message : "Internal Server Error",
+		}
+		return 500, output
+	}
+
+	output := outputs.CancelOrderOutput{}
+	output.Code = 200
+	output.Message = "Success"
+	output.Data = responsesDTO.OrderResponseDTO{
+		ID : order.ID,
+		UserID : order.UserID,
+		Status : order.Status,
+		TotalPrice : order.TotalPrice,
+		ShippingAddress : order.ShippingAddress,
+		PaymentMethod : order.PaymentMethod,
+		IsActive : order.IsActive,
+		CreatedBy : order.CreatedBy,
+		UpdatedBy : order.UpdatedBy,
+		CreatedAt : order.CreatedAt,
 		UpdatedAt : order.UpdatedAt,
 		OrderItems : orderItems,
 	}

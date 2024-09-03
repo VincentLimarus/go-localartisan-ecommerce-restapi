@@ -1,6 +1,7 @@
 package responsesDTO
 
 import (
+	"localArtisans/models/database"
 	"time"
 
 	"github.com/google/uuid"
@@ -9,7 +10,7 @@ import (
 type OrderResponseDTO struct {
 	ID              uuid.UUID				`json:"id"`
 	UserID          uuid.UUID               `json:"user_id"`
-	Status          string                  `json:"status"`
+	Status          database.OrderStatusType `json:"status"`
 	TotalPrice      float64                 `json:"total_price"`
 	ShippingAddress string                  `json:"shipping_address"`
 	PaymentMethod   string                  `json:"payment_method"`

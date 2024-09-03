@@ -327,7 +327,7 @@ func CheckoutProductFromCart(CheckoutProductFromCartRequestDTO requestsDTO.Check
 		}
 		err = db.Create(&order).Error
 	}
-
+	
 	if err != nil {
 		output := outputs.InternalServerErrorOutput{
 			Code: 500,

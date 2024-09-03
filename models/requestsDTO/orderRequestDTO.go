@@ -45,3 +45,7 @@ type PayOrderRequestDTO struct {
 type FinishOrderRequestDTO struct {
 	ID string `json:"id" form:"id" binding:"required"`
 }
+
+type CancelOrderRequestDTO struct {
+	ID string `json:"id" form:"id" binding:"required"`
+}

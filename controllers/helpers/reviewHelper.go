@@ -170,6 +170,35 @@ func CreateReview(CreateReviewRequestDTO requestsDTO.CreateReviewRequestDTO) (in
 		return 500, output
 	}
 
+	var product database.Products
+
+	err = db.Table("products").Where("id = ?", CreateReviewRequestDTO.ProductID).First(&product).Error
+
+	if err != nil {
+		output := outputs.NotFoundOutput{
+			Code: 404,
+			Message: "Not Found: Product not exist",
+		}
+		return 404, output
+	}
+
+	// rating hanya bisa 1 - 5, gk bisa kasih 0 atau lebih dari 5
+	if product.Rating == 0 {
+		product.Rating = (product.Rating + CreateReviewRequestDTO.Rating)
+	} else {
+		product.Rating = (product.Rating + CreateReviewRequestDTO.Rating) / 2
+	}
+
+	err = db.Save(&product).Error
+
+	if err != nil {
+		output := outputs.InternalServerErrorOutput{
+			Code: 500,
+			Message: "Internal Server Error" + err.Error(),
+		}
+		return 500, output
+	}
+
 	output := outputs.CreateReviewOutput{
 		BaseOutput: outputs.BaseOutput{
 			Code: 200,

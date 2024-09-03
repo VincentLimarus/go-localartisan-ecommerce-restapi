@@ -114,12 +114,27 @@ func FinishOrder(c *gin.Context) {
 	c.JSON(code, output)
 }
 
+func CancelOrder(c *gin.Context) {
+	var CancelOrderRequestDTO requestsDTO.CancelOrderRequestDTO
+	if err := c.ShouldBindJSON(&CancelOrderRequestDTO); err != nil {
+		output := outputs.BadRequestOutput{
+			Code:    400,
+			Message: fmt.Sprintf("Bad Request: %v", err),
+		}
+		c.JSON(http.StatusBadRequest, output)
+		return
+	}
+	code, output := helpers.CancelOrder(CancelOrderRequestDTO)
+	c.JSON(code, output)
+}
+
 func AuthOrderService(router *gin.RouterGroup) {
 	router.GET("/orders", GetAllOrder)
 	router.GET("/order/:id", GetOrderByOrderID)
 	router.GET("/orders/user/:id", GetAllOrderByUserID)
+	router.POST("/orders/user/status", GetAllOrderByUserIDAndStatus)
 	router.POST("/order/delete", DeleteOrder)
 	router.POST("/order/pay", PayOrder)
 	router.POST("/order/finish", FinishOrder)
-	router.POST("/orders/user/status", GetAllOrderByUserIDAndStatus)
+	router.POST("/order/cancel", CancelOrder)
 }

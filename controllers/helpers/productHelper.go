@@ -356,7 +356,19 @@ func AddProductToCart(AddProductToCartRequestDTO requestsDTO.AddProductToCartReq
 			}
 			return 500, output
 		}
-	} 
+	} else if err == nil && AddProductToCartRequestDTO.CartID != "" {
+		err = db.Table("carts").Where("id = ?", AddProductToCartRequestDTO.CartID).First(&carts).Error
+		if err != nil {
+			output := outputs.NotFoundOutput{
+				Code: 404,
+				Message: "Not Found: Cart not exist",
+			}
+			return 404, output
+		}
+
+		carts.ID = utils.StringToUUID(AddProductToCartRequestDTO.CartID)
+	}
+
 	err = db.Table("carts").Where("user_id = ?", UserID).First(&carts).Error
 	if err != nil {
 		output := outputs.NotFoundOutput{

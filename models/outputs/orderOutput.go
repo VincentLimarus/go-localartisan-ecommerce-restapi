@@ -42,3 +42,8 @@ type FinishOrderOutput struct {
 	BaseOutput
 	Data responsesDTO.OrderResponseDTO `json:"data"`
 }
+
+type CancelOrderOutput struct {
+	BaseOutput
+	Data responsesDTO.OrderResponseDTO `json:"data"`
+}
