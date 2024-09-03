@@ -19,6 +19,10 @@ So This Repository is going to answer the challenges by doing backend and databa
 
 - **Checkout Products in Cart**: Allows users to checkout multiple products they have added to their cart.
 
+- **Pay Order**: Allow the user to pay for an order they placed earlier. Once the order is paid, the quantity of the product will be decreased according to the user’s request.
+
+- **Cancel Order**: Enable the system to cancel an order if there is a discrepancy between the user and the artisan during the ordering process. The product quantity will be restored to its original amount, and the order will be marked as canceled.
+
 **Key Takeaways**
 ---
 - Upon login, cookies are generated to enable access to authentication-required services.
