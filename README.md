@@ -1,7 +1,10 @@
 **LocalArtisans - Rest API E-Commerce**
 --------------------------------
-Indonesian artisans struggle to expand their market and showcase their craftsmanship beyond local communities. A platform is needed to help them display products, sell online, and promote Indonesia's cultural heritage.
-So This Repository is going to answer the challenges by doing backend and database development. I'll use Golang with Gin and GORM alongside PostgreSQL for efficient data management. This approach ensures the E-commerce Platform for Local Artisans tackles the practical issues faced by Indonesian artisans while also preserving and promoting Indonesia’s cultural heritage digitally.
+LocalArtisans is a backend service project that centers on building a robust RESTful API for an e-commerce platform aimed at helping Indonesian artisans. The project focuses on efficient communication between services, ensuring that every user request is handled securely with proper authentication.
+
+The backend is built using Golang with the Gin framework and GORM for handling database operations. All incoming API requests are managed and stored in a PostgreSQL database, ensuring data integrity and reliability. The goal is to provide a seamless and scalable API structure that supports the platform’s functionality while maintaining strong security measures.
+
+This project focuses solely on backend development, ensuring that the services provided to artisans are well-supported and secure, allowing their products and craftsmanship to be efficiently managed and showcased.
 
 **Main Features**
 ---
