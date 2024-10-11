@@ -79,7 +79,7 @@ TIMEOUT="3s"
 ---
 Clone this repository into ur Local
 ```
-git clone https://github.com/VincentLimarus/LocalArtisan-RestAPI.git
+git clone https://github.com/VincentLimarus/go-localartisan-ecommerce-restapi.git
 ```
 Go to the Directory
 ```
