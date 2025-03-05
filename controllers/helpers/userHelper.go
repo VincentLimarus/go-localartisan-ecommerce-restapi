@@ -21,7 +21,7 @@ func GetAllUser(GetAllUsersRequestDTO requestsDTO.GetAllUsersRequestDTO) (int, i
 	if GetAllUsersRequestDTO.Limit == 0  || GetAllUsersRequestDTO.Limit > 100{
 		output := outputs.BadRequestOutput{
 			Code: 400,
-			Message: "Bad Request: Limit cannot be 0",
+			Message: "Bad Request: Limit cannot be 0 / 100",
 		}
 		return 400, output
 	}

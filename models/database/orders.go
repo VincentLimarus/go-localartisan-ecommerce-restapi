@@ -18,7 +18,7 @@ const (
 type Orders struct {
 	ID               uuid.UUID        `gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"`
 	UserID           uuid.UUID        `gorm:"type:uuid;not null"`
-	Status           OrderStatusType  `gorm:"type:enum('Waiting for Payment', 'Order Finished', 'Order Canceled', 'Order Paid');not null;default:'Waiting for Payment'"`
+	Status           OrderStatusType  `gorm:"type:varchar;not null;default:'Waiting for Payment'"`
 	TotalPrice       float64          `gorm:"type:float;not null"`
 	ShippingAddress  string           `gorm:"type:text;not null"`
 	PaymentMethod    string           `gorm:"type:varchar(255);not null"`

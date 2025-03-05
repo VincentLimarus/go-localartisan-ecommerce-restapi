@@ -66,13 +66,13 @@ func LoginUser(c *gin.Context){
 			Message: fmt.Sprintf("Bad Request: %v", err),
 		}
 		c.JSON(http.StatusBadRequest, output)
-		return
+		return				
 	}
 	code , output, token := helpers.LoginUser(LoginUserRequestDTO)
 	c.SetCookie("Authorization", token, 3600*12, "/", "localhost", true, true)
 	c.SetSameSite(http.StatusOK)
 	c.JSON(code, output)
-}
+}				
 
 func UpdateUser(c *gin.Context){
 	var UpdateUserRequestDTO requestsDTO.UpdateUserRequestDTO

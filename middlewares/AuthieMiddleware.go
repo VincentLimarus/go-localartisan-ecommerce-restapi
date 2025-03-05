@@ -43,7 +43,6 @@ func RequiredAuth() gin.HandlerFunc {
 
 		// Simpan email pengguna dalam context
 		c.Set("user_email", email)
-
 		// Lanjutkan ke handler berikutnya
 		c.Next()
 	}

@@ -28,7 +28,7 @@ func RoutersConfiguration() *gin.Engine{
 	})
 
 	router.GET("/api/v1/docs", func (c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{"Code": 400, "message": "Documentation will be added soon"}) // Docs will be added later
+		c.JSON(http.StatusOK, gin.H{"Code": 400, "message": "Documentation will be added soon"}) 
 	})
 
 	// --------------- Base Routes ----------------

@@ -82,9 +82,11 @@ func DeleteOrder(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, output)
 		return
 	}
-	code, output := helpers.DeleteOrder(DeleteOrderRequestDTO)
+
+	code, output := helpers.DeleteOrder(c, DeleteOrderRequestDTO)
 	c.JSON(code, output)
 }
+
 
 func PayOrder(c *gin.Context) {
 	var PayOrderRequestDTO requestsDTO.PayOrderRequestDTO

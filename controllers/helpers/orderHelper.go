@@ -1,6 +1,8 @@
 package helpers
 
 import (
+	"context"
+	"encoding/json"
 	"fmt"
 	"localArtisans/configs"
 	"localArtisans/models/database"
@@ -8,6 +10,11 @@ import (
 	"localArtisans/models/repositories"
 	"localArtisans/models/requestsDTO"
 	"localArtisans/models/responsesDTO"
+	workers "localArtisans/worker"
+	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 func GetAllOrders(GetAllOrderRequestDTO requestsDTO.GetAllOrderRequestDTO) (int, interface{}) {
@@ -198,39 +205,74 @@ func GetAllOrderByUserID(userID string) (int, interface{}){
 	return 200, output
 }
 
-func DeleteOrder(DeleteOrderRequestDTO requestsDTO.DeleteOrderRequestDTO) (int, interface{}) {
+func DeleteOrder(c *gin.Context, DeleteOrderRequestDTO requestsDTO.DeleteOrderRequestDTO) (int, interface{}) {
 	db := configs.GetDB()
+	redisClient := configs.GetRedis()
 	order := database.Orders{}
-	
-	err := db.Table("orders").Where("id = ?", DeleteOrderRequestDTO.ID).First(&order).Error
 
+	err := db.Table("orders").Where("id = ?", DeleteOrderRequestDTO.ID).First(&order).Error
 	if err != nil {
 		output := outputs.InternalServerErrorOutput{
-			Code : 500,
-			Message : "Internal Server Error",
+			Code:    500,
+			Message: "Internal Server Error",
 		}
 		return 500, output
 	}
 
-	if len(order.ID) == 0 {
+	if order.ID == uuid.Nil {
 		output := outputs.NotFoundOutput{
-			Code : 404,
-			Message : "Not Found",
+			Code:    404,
+			Message: "Not Found",
 		}
 		return 404, output
 	}
-	
+
 	var orderItems []responsesDTO.OrderItemsResponseDTO
 	orderItems, err = repositories.GetAllOrderItemsByOrderID(order.ID.String())
-
 	if err != nil {
 		output := outputs.InternalServerErrorOutput{
-			Code : 500,
-			Message : "Internal Server Error",
+			Code:    500,
+			Message: "Internal Server Error",
+		}
+		return 500, output
+	}
+
+	email, exists := c.Get("user_email")
+	if !exists {
+		output := outputs.InternalServerErrorOutput{
+			Code:    500,
+			Message: "Internal Server Error",
 		}
 		return 500, output
 	}
 	
+	logData := workers.LogData{
+		Action:    fmt.Sprintf("Order %s deleted", order.ID),
+		UpdatedBy: email.(string),
+		UpdatedAt: time.Now(),
+	}
+
+	logDataJSON, _ := json.Marshal(logData)
+
+	ctx := context.Background()
+	err = redisClient.RPush(ctx, "log_activity_queue", logDataJSON).Err()
+	if err != nil {
+		output := outputs.InternalServerErrorOutput{
+			Code:    500,
+			Message: "Failed to enqueue log activity",
+		}
+		return 500, output
+	}
+
+	err = db.Table("orders").Where("id = ?", DeleteOrderRequestDTO.ID).Delete(&order).Error
+	if err != nil {
+		output := outputs.InternalServerErrorOutput{
+			Code:    500,
+			Message: "Internal Server Error",
+		}
+		return 500, output
+	}
+
 	output := outputs.DeleteOrderOutput{}
 	output.Code = 200
 	output.Message = "Success"
@@ -248,19 +290,9 @@ func DeleteOrder(DeleteOrderRequestDTO requestsDTO.DeleteOrderRequestDTO) (int, 
 		UpdatedAt : order.UpdatedAt,	
 		OrderItems : orderItems,
 	}
-
-	err = db.Table("orders").Where("id = ?", DeleteOrderRequestDTO.ID).Delete(&order).Error
-
-	if err != nil {
-		output := outputs.InternalServerErrorOutput{
-			Code : 500,
-			Message : "Internal Server Error",
-		}
-		return 500, output
-	}	
-
 	return 200, output
 }
+
 
 func PayOrder(PayOrderRequestDTO requestsDTO.PayOrderRequestDTO) (int, interface{}) {
 	db := configs.GetDB()
